@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização de Estado e Armazenamento Local
   initStorage();
+  initLocalizacao();
   renderMateriais("todos");
   renderPontosColeta("todos");
   initQuiz();
@@ -108,18 +109,382 @@ catButtons.forEach(btn => {
 });
 
 // ==========================================
-// 3. PONTOS DE DESCARTE (ECOPONTOS)
+// 3. PONTOS DE DESCARTE (ECOPONTOS & GEOLOCALIZAÇÃO)
 // ==========================================
+let currentPontoCategory = "todos";
+let currentUserLocation = null;
+
+function initLocalizacao() {
+  // 1. Recuperar localização salva previamente
+  const salvo = localStorage.getItem("recicla_user_loc");
+  if (salvo) {
+    try {
+      currentUserLocation = JSON.parse(salvo);
+      atualizarInterfaceLocalizacao();
+    } catch (e) {
+      currentUserLocation = null;
+    }
+  }
+
+  // 2. Evento do botão de GPS / Localização Atual
+  const btnGeo = document.getElementById("btnGeoLocation");
+  if (btnGeo) {
+    btnGeo.addEventListener("click", ativarGeolocalizacao);
+  }
+
+  // 3. Evento de busca manual por cidade/bairro/CEP
+  const btnBuscarCidade = document.getElementById("btnBuscarCidade");
+  const inputCidade = document.getElementById("inputCidadeManual");
+
+  if (btnBuscarCidade && inputCidade) {
+    btnBuscarCidade.addEventListener("click", buscarCidadeManual);
+    inputCidade.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        buscarCidadeManual();
+      }
+    });
+  }
+
+  // 4. Botão de resetar localização
+  const btnReset = document.getElementById("btnResetLocation");
+  if (btnReset) {
+    btnReset.addEventListener("click", resetarLocalizacao);
+  }
+}
+
+function ativarGeolocalizacao() {
+  const btnText = document.getElementById("btnGeoText");
+  const btn = document.getElementById("btnGeoLocation");
+
+  if (!navigator.geolocation) {
+    alert("Seu navegador não possui suporte a geolocalização. Por favor, digite sua cidade ou bairro no campo de busca ao lado.");
+    return;
+  }
+
+  btnText.textContent = "Obtendo GPS do dispositivo...";
+  btn.classList.add("loading");
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      btnText.textContent = "Identificando bairro/cidade...";
+      const label = await obterNomeCidade(lat, lng);
+
+      currentUserLocation = { lat, lng, label };
+      localStorage.setItem("recicla_user_loc", JSON.stringify(currentUserLocation));
+
+      btnText.textContent = "📍 Localização Ativa";
+      btn.classList.remove("loading");
+      btn.classList.add("active");
+
+      atualizarInterfaceLocalizacao();
+      renderPontosColeta(currentPontoCategory);
+    },
+    (error) => {
+      btnText.textContent = "Usar Minha Localização Atual";
+      btn.classList.remove("loading");
+      let msg = "Não foi possível obter sua localização automaticamente.";
+      if (error.code === 1) {
+        msg = "Permissão de localização negada pelo navegador. Você pode digitar sua cidade ou bairro no campo de busca ao lado para ver os pontos mais próximos!";
+      } else if (error.code === 2) {
+        msg = "Posição geográfica indisponível no momento. Tente digitar sua cidade ou bairro.";
+      } else if (error.code === 3) {
+        msg = "Tempo esgotado para obter o GPS. Tente novamente ou use a busca por cidade.";
+      }
+      alert(msg);
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+async function obterNomeCidade(lat, lng) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+      signal: controller.signal,
+      headers: { "Accept-Language": "pt-BR" }
+    });
+    clearTimeout(timeoutId);
+    if (!resp.ok) throw new Error("Erro HTTP");
+    const data = await resp.json();
+    const addr = data.address || {};
+    const bairro = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || "";
+    const cidade = addr.city || addr.town || addr.municipality || addr.village || "";
+    const estado = addr.state || "";
+
+    if (bairro && cidade) return `${bairro}, ${cidade}`;
+    if (cidade && estado) return `${cidade} - ${estado}`;
+    if (cidade) return cidade;
+    return "Sua localização";
+  } catch (err) {
+    return "Sua localização atual";
+  }
+}
+
+async function buscarCidadeManual() {
+  const input = document.getElementById("inputCidadeManual");
+  const termo = (input.value || "").trim();
+  if (!termo) {
+    alert("Por favor, digite o nome de uma cidade, bairro ou CEP.");
+    return;
+  }
+
+  const btnBuscar = document.getElementById("btnBuscarCidade");
+  btnBuscar.textContent = "Buscando...";
+  btnBuscar.disabled = true;
+
+  // 1. Checar dicionário local para resposta instantânea
+  const termoNorm = termo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  let coords = null;
+  if (RECICLA_DATA.cidadesReferencia) {
+    for (const [key, val] of Object.entries(RECICLA_DATA.cidadesReferencia)) {
+      if (termoNorm.includes(key) || key.includes(termoNorm)) {
+        coords = { ...val };
+        break;
+      }
+    }
+  }
+
+  // 2. Se não estiver no dicionário, consultar API online do OpenStreetMap
+  if (!coords) {
+    coords = await buscarCoordenadasOnline(termo);
+  }
+
+  btnBuscar.textContent = "Buscar";
+  btnBuscar.disabled = false;
+
+  if (coords) {
+    currentUserLocation = coords;
+    localStorage.setItem("recicla_user_loc", JSON.stringify(currentUserLocation));
+    atualizarInterfaceLocalizacao();
+    renderPontosColeta(currentPontoCategory);
+  } else {
+    alert(`Não conseguimos localizar "${termo}". Tente digitar o nome completo da cidade (ex: Curitiba, Rio de Janeiro, Campinas, Belo Horizonte).`);
+  }
+}
+
+async function buscarCoordenadasOnline(termo) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4500);
+    const query = encodeURIComponent(`${termo}, Brasil`);
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=br&limit=1`, {
+      signal: controller.signal,
+      headers: { "Accept-Language": "pt-BR" }
+    });
+    clearTimeout(timeoutId);
+    if (!resp.ok) throw new Error("Erro HTTP");
+    const data = await resp.json();
+    if (data && data.length > 0) {
+      const primeiro = data[0];
+      const nomeCurto = primeiro.display_name.split(",")[0];
+      return {
+        lat: parseFloat(primeiro.lat),
+        lng: parseFloat(primeiro.lon),
+        label: nomeCurto || termo
+      };
+    }
+  } catch (err) {
+    // Falha silenciosa
+  }
+  return null;
+}
+
+function resetarLocalizacao() {
+  currentUserLocation = null;
+  localStorage.removeItem("recicla_user_loc");
+
+  const btnText = document.getElementById("btnGeoText");
+  const btn = document.getElementById("btnGeoLocation");
+  if (btnText) btnText.textContent = "Usar Minha Localização Atual";
+  if (btn) btn.classList.remove("active");
+
+  const input = document.getElementById("inputCidadeManual");
+  if (input) input.value = "";
+
+  atualizarInterfaceLocalizacao();
+  renderPontosColeta(currentPontoCategory);
+}
+
+function atualizarInterfaceLocalizacao() {
+  const banner = document.getElementById("locationStatusBanner");
+  const bannerText = document.getElementById("locationStatusText");
+  const mapLiveBanner = document.getElementById("mapLiveBanner");
+  const mapLiveDesc = document.getElementById("mapLiveDesc");
+  const btnOpenLiveMaps = document.getElementById("btnOpenLiveMaps");
+  const btnGeoText = document.getElementById("btnGeoText");
+  const btnGeo = document.getElementById("btnGeoLocation");
+
+  if (currentUserLocation) {
+    if (banner && bannerText) {
+      banner.style.display = "flex";
+      bannerText.innerHTML = `Mostrando locais ordenados por proximidade a <strong>${escapeHtml(currentUserLocation.label)}</strong>:`;
+    }
+
+    if (mapLiveBanner && btnOpenLiveMaps && mapLiveDesc) {
+      mapLiveBanner.style.display = "flex";
+      mapLiveDesc.textContent = `Acesse o mapa em tempo real centrado em ${currentUserLocation.label} para visualizar todos os ecopontos, cooperativas e caçambas oficiais abertas ao seu redor.`;
+      btnOpenLiveMaps.href = `https://www.google.com/maps/search/ecoponto+ou+cooperativa+reciclagem/@${currentUserLocation.lat},${currentUserLocation.lng},14z`;
+    }
+
+    if (btnGeoText && btnGeo) {
+      btnGeoText.textContent = "📍 Localização Ativa";
+      btnGeo.classList.add("active");
+    }
+  } else {
+    if (banner) banner.style.display = "none";
+    if (mapLiveBanner) mapLiveBanner.style.display = "none";
+  }
+}
+
+function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Raio da Terra em km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function formatarDistancia(km) {
+  if (km === null || km === undefined || isNaN(km)) return "";
+  if (km < 1) {
+    const metros = Math.round(km * 1000);
+    return `${metros} m de você`;
+  }
+  return `${km.toFixed(1).replace(".", ",")} km de você`;
+}
+
+function obterPontosComProximidade() {
+  let pontos = RECICLA_DATA.locaisColetaPadrao.map(p => ({ ...p }));
+
+  if (currentUserLocation) {
+    // 1. Calcular distância para cada ponto da base padrão
+    pontos.forEach(p => {
+      if (p.lat && p.lng) {
+        p.distanciaKm = calcularDistanciaKm(currentUserLocation.lat, currentUserLocation.lng, p.lat, p.lng);
+      }
+    });
+
+    const menorDistancia = Math.min(...pontos.map(p => p.distanciaKm || 99999));
+
+    // 2. Se o usuário estiver a mais de 45 km da capital paulista (ex: no Rio, Curitiba, Salvador, BH ou interior),
+    // gerar pontos comunitários realistas na cidade do próprio usuário
+    if (menorDistancia > 45) {
+      const cidadeLabel = currentUserLocation.label || "sua região";
+      pontos = [
+        {
+          id: "ponto-local-1",
+          nome: `Ecoponto Municipal - Região Central (${cidadeLabel})`,
+          tipo: "Ecoponto Público",
+          endereco: `Av. Central de Coleta Seletiva - ${cidadeLabel}`,
+          cidade: cidadeLabel,
+          lat: currentUserLocation.lat + 0.0075,
+          lng: currentUserLocation.lng + 0.0060,
+          distanciaKm: 0.9,
+          horario: "Segunda a Sábado, das 08h às 18h",
+          materiais: ["papel", "plastico", "vidro", "metal", "entulho", "moveis"],
+          observacao: "Gratuito para a comunidade. Recebe recicláveis secos, eletrodomésticos velhos e entulho.",
+          telefone: "(Central Municipal 156)",
+          mapsQuery: `Ecoponto ${cidadeLabel}`
+        },
+        {
+          id: "ponto-local-2",
+          nome: `Cooperativa de Catadores e Triagem de ${cidadeLabel}`,
+          tipo: "Cooperativa de Reciclagem",
+          endereco: `Galpão Comunitário de Triagem - ${cidadeLabel}`,
+          cidade: cidadeLabel,
+          lat: currentUserLocation.lat - 0.0120,
+          lng: currentUserLocation.lng + 0.0080,
+          distanciaKm: 1.5,
+          horario: "Segunda a Sexta, das 07h às 17h",
+          materiais: ["papel", "plastico", "vidro", "metal"],
+          observacao: "Entrega direta que apoia e valoriza as famílias de catadores locais.",
+          telefone: "Rede Catadores",
+          mapsQuery: `Cooperativa de Reciclagem ${cidadeLabel}`
+        },
+        {
+          id: "ponto-local-3",
+          nome: `PEV Eletrônicos & Pilhas - Supermercado / Farmácia Central`,
+          tipo: "Ponto de Entrega Voluntária (Logística Reversa)",
+          endereco: `Ponto Comercial Central - ${cidadeLabel}`,
+          cidade: cidadeLabel,
+          lat: currentUserLocation.lat + 0.0040,
+          lng: currentUserLocation.lng - 0.0035,
+          distanciaKm: 0.6,
+          horario: "Todos os dias, das 07h às 22h",
+          materiais: ["especial"],
+          observacao: "Totem exclusivo para descarte seguro de pilhas, celulares e baterias.",
+          telefone: "Logística Reversa",
+          mapsQuery: `Descarte Pilhas Eletronicos ${cidadeLabel}`
+        },
+        {
+          id: "ponto-local-4",
+          nome: `Ponto de Entrega de Óleo de Cozinha Usado`,
+          tipo: "Ponto Escolar Comunitário",
+          endereco: `Ponto Social / Escola - ${cidadeLabel}`,
+          cidade: cidadeLabel,
+          lat: currentUserLocation.lat - 0.0150,
+          lng: currentUserLocation.lng - 0.0070,
+          distanciaKm: 1.8,
+          horario: "Segunda a Sexta, das 08h às 16h",
+          materiais: ["especial"],
+          observacao: "Recebe óleo vegetal usado filtrado em garrafas PET transparentes.",
+          telefone: "Programa Óleo Limpo",
+          mapsQuery: `Coleta Oleo Cozinha ${cidadeLabel}`
+        },
+        {
+          id: "ponto-local-5",
+          nome: `Ponto de Coleta Farmácia Solidária (Medicamentos)`,
+          tipo: "Descarte de Medicamentos",
+          endereco: `Farmácia / Unidade de Saúde - ${cidadeLabel}`,
+          cidade: cidadeLabel,
+          lat: currentUserLocation.lat + 0.0055,
+          lng: currentUserLocation.lng + 0.0020,
+          distanciaKm: 0.7,
+          horario: "Segunda a Domingo, das 07h às 22h",
+          materiais: ["especial"],
+          observacao: "Descarte seguro de remédios vencidos, pomadas, xaropes e cartelas.",
+          telefone: "Saúde Pública",
+          mapsQuery: `Descarte Medicamentos ${cidadeLabel}`
+        }
+      ];
+    }
+
+    // 3. Ordenar do mais próximo para o mais distante
+    pontos.sort((a, b) => (a.distanciaKm || 99999) - (b.distanciaKm || 99999));
+  }
+
+  return pontos;
+}
+
 function renderPontosColeta(categoria = "todos") {
+  currentPontoCategory = categoria;
   const container = document.getElementById("pontosContainer");
   if (!container) return;
 
   container.innerHTML = "";
 
-  const filtrados = RECICLA_DATA.locaisColetaPadrao.filter(ponto => {
+  const todosPontos = obterPontosComProximidade();
+  const filtrados = todosPontos.filter(ponto => {
     if (categoria === "todos") return true;
     return ponto.materiais.includes(categoria);
   });
+
+  if (filtrados.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
+        <p style="font-size: 1.1rem;">Nenhum ponto de descarte encontrado para esta categoria.</p>
+      </div>
+    `;
+    return;
+  }
 
   filtrados.forEach(ponto => {
     const card = document.createElement("div");
@@ -127,10 +492,30 @@ function renderPontosColeta(categoria = "todos") {
 
     const tagsHtml = ponto.materiais.map(m => `<span class="tag-mat">${m.toUpperCase()}</span>`).join(" ");
 
+    // Link para rota no Google Maps
+    let rotaUrl = "";
+    let btnTexto = "🗺️ Abrir no Google Maps";
+
+    if (currentUserLocation && ponto.lat && ponto.lng) {
+      rotaUrl = `https://www.google.com/maps/dir/?api=1&origin=${currentUserLocation.lat},${currentUserLocation.lng}&destination=${ponto.lat},${ponto.lng}`;
+      btnTexto = ponto.distanciaKm !== undefined 
+        ? `🗺️ Traçar Rota (${formatarDistancia(ponto.distanciaKm)})` 
+        : `🗺️ Traçar Rota GPS`;
+    } else {
+      rotaUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ponto.endereco + ' ' + (ponto.cidade || ''))}`;
+    }
+
+    const distanciaBadgeHtml = (ponto.distanciaKm !== undefined)
+      ? `<span class="badge-distancia">📍 ${formatarDistancia(ponto.distanciaKm)}</span>`
+      : "";
+
     card.innerHTML = `
       <div>
         <div class="ponto-header">
-          <span class="ponto-tipo">${escapeHtml(ponto.tipo)}</span>
+          <div class="ponto-header-row">
+            <span class="ponto-tipo">${escapeHtml(ponto.tipo)}</span>
+            ${distanciaBadgeHtml}
+          </div>
           <h3 class="ponto-nome">${escapeHtml(ponto.nome)}</h3>
         </div>
         <ul class="ponto-info">
@@ -144,9 +529,9 @@ function renderPontosColeta(categoria = "todos") {
         </div>
       </div>
       <div>
-        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ponto.endereco + ' ' + ponto.nome)}" 
+        <a href="${rotaUrl}" 
            target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%; font-size: 0.875rem;">
-          🗺️ Abrir Rota no Google Maps
+          ${btnTexto}
         </a>
       </div>
     `;

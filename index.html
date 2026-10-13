@@ -110,11 +110,47 @@
   <section id="onde-descartar" class="section section-alt">
     <div class="container">
       <div class="section-header">
-        <span class="section-badge">Destinação Certa</span>
-        <h2 class="section-title">Onde Descartar na Nossa Comunidade?</h2>
+        <span class="section-badge">Destinação Certa & Geolocalização</span>
+        <h2 class="section-title">Onde Descartar Perto de Você?</h2>
         <p class="section-desc">
-          Locais oficiais, cooperativas de catadores e pontos de entrega voluntária (PEV). Verifique sempre os materiais aceitos antes de levar.
+          Encontre ecopontos, cooperativas e pontos de entrega voluntária (PEV) mais próximos da sua localização, com distância e rota direta no mapa.
         </p>
+      </div>
+
+      <!-- BARRA DE LOCALIZAÇÃO DO USUÁRIO -->
+      <div class="location-toolbar">
+        <div class="location-toolbar-main">
+          <button id="btnGeoLocation" class="btn btn-primary btn-geo" type="button">
+            <span class="geo-icon">📍</span>
+            <span id="btnGeoText">Usar Minha Localização Atual</span>
+          </button>
+          
+          <div class="location-search-wrap">
+            <input type="text" id="inputCidadeManual" placeholder="Ou digite sua cidade, bairro ou CEP (ex: São Paulo, Tijuca, Copacabana)..." autocomplete="off">
+            <button id="btnBuscarCidade" class="btn btn-secondary" type="button">Buscar</button>
+          </div>
+        </div>
+
+        <div id="locationStatusBanner" class="location-status-banner" style="display: none;">
+          <div class="location-status-content">
+            <span class="status-icon">📍</span>
+            <span id="locationStatusText">Mostrando pontos próximos a você</span>
+          </div>
+          <button id="btnResetLocation" class="btn-link-reset" title="Restaurar visualização geral">Mostrar todos</button>
+        </div>
+      </div>
+
+      <!-- BANNER DE ACESSO AO MAPA EM TEMPO REAL -->
+      <div id="mapLiveBanner" class="map-live-banner" style="display: none;">
+        <div>
+          <h4>🗺️ Visualizar no Google Maps da Sua Região</h4>
+          <p id="mapLiveDesc">
+            Abra o mapa interativo centrado na sua localização para explorar todos os ecopontos, cooperativas e caçambas oficiais cadastradas.
+          </p>
+        </div>
+        <a id="btnOpenLiveMaps" href="https://www.google.com/maps/search/ecoponto+ou+cooperativa+reciclagem" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="color: #064e3b; font-weight: 700; white-space: nowrap;">
+          Abrir Mapa em Tempo Real ↗
+        </a>
       </div>
 
       <div class="filter-bar" style="margin-bottom: 2rem;">
@@ -132,7 +168,7 @@
       </div>
 
       <div class="pontos-notice">
-        <strong>💡 Dica para o seu projeto de extensão:</strong> Este catálogo pode ser ajustado com os ecopontos e cooperativas reais do seu município ou bairro, fortalecendo a parceria direta da faculdade com o poder público e as associações de catadores locais.
+        <strong>💡 Dica de Sustentabilidade Comunitária:</strong> Ao utilizar o botão de rotas, seu celular traça o melhor caminho a pé, de bicicleta ou transporte público até o ecoponto ou cooperativa, reduzindo também a pegada de carbono do deslocamento.
       </div>
     </div>
   </section>

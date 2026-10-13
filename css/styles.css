@@ -496,6 +496,145 @@ body {
 }
 
 /* ONDE DESCARTAR */
+.location-toolbar {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.location-toolbar-main {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-geo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-geo.active {
+  background-color: var(--primary-dark);
+}
+
+.btn-geo .geo-icon {
+  font-size: 1.15rem;
+}
+
+.location-search-wrap {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.location-search-wrap input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.925rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+.location-search-wrap input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.15);
+}
+
+.location-status-banner {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #166534;
+  animation: fadeIn 0.25s ease;
+}
+
+.location-status-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-link-reset {
+  background: none;
+  border: none;
+  color: #0d6936;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.ponto-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.badge-distancia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: #dcfce7;
+  color: #15803d;
+  font-size: 0.775rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid #bbf7d0;
+}
+
+/* BANNER DE MAPA EM TEMPO REAL */
+.map-live-banner {
+  background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%);
+  color: white;
+  border-radius: var(--border-radius);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-md);
+}
+
+.map-live-banner h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.map-live-banner p {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  max-width: 650px;
+}
+
 .pontos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
