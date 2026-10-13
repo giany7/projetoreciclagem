@@ -1123,16 +1123,6 @@ body {
   background-color: var(--primary);
 }
 
-.metrics-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
-}
-
 /* SOBRE O PROJETO */
 .about-grid {
   display: grid;
