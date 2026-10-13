@@ -2,11 +2,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização de Estado e Armazenamento Local
   initStorage();
-  initStudentConfig();
   renderMateriais("todos");
   renderPontosColeta("todos");
   initQuiz();
-  initFormAvaliacao();
   updateMetricsDashboard();
   initNavEvents();
 });
@@ -28,69 +26,6 @@ function initStorage() {
   if (!localStorage.getItem("recicla_quiz_depois")) {
     localStorage.setItem("recicla_quiz_depois", JSON.stringify([]));
   }
-  if (!localStorage.getItem("recicla_avaliacoes")) {
-    localStorage.setItem("recicla_avaliacoes", JSON.stringify([]));
-  }
-}
-
-// Configurações do Aluno / Projeto
-function initStudentConfig() {
-  const defaultInfo = {
-    aluno: "Ingrid",
-    curso: "Graduação / Ensino Superior",
-    instituicao: "Universidade / Faculdade",
-    orientador: "Prof. Orientador(a)"
-  };
-
-  const saved = JSON.parse(localStorage.getItem("recicla_student_info") || "null") || defaultInfo;
-  applyStudentInfo(saved);
-
-  // Eventos do modal
-  const modal = document.getElementById("configModal");
-  const openBtn = document.getElementById("btnOpenConfig");
-  const closeBtn = document.getElementById("btnCloseConfig");
-  const saveBtn = document.getElementById("btnSaveConfig");
-
-  if (openBtn && modal) {
-    openBtn.addEventListener("click", () => {
-      document.getElementById("inputNomeAluno").value = saved.aluno || "";
-      document.getElementById("inputCurso").value = saved.curso || "";
-      document.getElementById("inputInstituicao").value = saved.instituicao || "";
-      document.getElementById("inputOrientador").value = saved.orientador || "";
-      modal.classList.add("active");
-    });
-  }
-
-  if (closeBtn && modal) {
-    closeBtn.addEventListener("click", () => modal.classList.remove("active"));
-  }
-
-  if (saveBtn && modal) {
-    saveBtn.addEventListener("click", () => {
-      const newInfo = {
-        aluno: document.getElementById("inputNomeAluno").value.trim() || "Estudante",
-        curso: document.getElementById("inputCurso").value.trim() || "Graduação",
-        instituicao: document.getElementById("inputInstituicao").value.trim() || "Instituição de Ensino",
-        orientador: document.getElementById("inputOrientador").value.trim() || "Orientação Docente"
-      };
-      localStorage.setItem("recicla_student_info", JSON.stringify(newInfo));
-      applyStudentInfo(newInfo);
-      modal.classList.remove("active");
-      alert("Dados do projeto atualizados com sucesso!");
-    });
-  }
-}
-
-function applyStudentInfo(info) {
-  const elAluno = document.getElementById("displayAluno");
-  const elCurso = document.getElementById("displayCurso");
-  const elInst = document.getElementById("displayInstituicao");
-  const elOrientador = document.getElementById("displayOrientador");
-
-  if (elAluno) elAluno.textContent = info.aluno;
-  if (elCurso) elCurso.textContent = info.curso;
-  if (elInst) elInst.textContent = info.instituicao;
-  if (elOrientador) elOrientador.textContent = info.orientador;
 }
 
 // ==========================================
@@ -450,55 +385,12 @@ function renderQuizComparativo() {
 }
 
 // ==========================================
-// 5. QUESTIONÁRIO DE AVALIAÇÃO COMUNITÁRIA
-// ==========================================
-function initFormAvaliacao() {
-  const form = document.getElementById("formAvaliacaoImpacto");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const avaliacao = {
-      id: "resp-" + Date.now(),
-      data: new Date().toISOString(),
-      faixaEtaria: formData.get("faixaEtaria"),
-      separavaAntes: formData.get("separavaAntes"),
-      clarezaSite: formData.get("clarezaSite"),
-      intencaoSeparar: formData.get("intencaoSeparar"),
-      comentario: (formData.get("comentario") || "").trim()
-    };
-
-    const existentes = JSON.parse(localStorage.getItem("recicla_avaliacoes") || "[]");
-    existentes.push(avaliacao);
-    localStorage.setItem("recicla_avaliacoes", JSON.stringify(existentes));
-
-    form.reset();
-    showFormSuccess();
-    updateMetricsDashboard();
-  });
-}
-
-function showFormSuccess() {
-  const el = document.getElementById("formSuccessMsg");
-  if (el) {
-    el.style.display = "block";
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => {
-      el.style.display = "none";
-    }, 8000);
-  }
-}
-
-// ==========================================
-// 6. DASHBOARD DE MÉTRICAS & EXPORTAÇÃO
+// 5. DASHBOARD DE MÉTRICAS & EXPORTAÇÃO
 // ==========================================
 function updateMetricsDashboard() {
   const visits = parseInt(localStorage.getItem("recicla_visits") || "1", 10);
   const quizAntes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
   const quizDepois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
-  const avaliacoes = JSON.parse(localStorage.getItem("recicla_avaliacoes") || "[]");
 
   const totalQuizzes = quizAntes.length + quizDepois.length;
 
@@ -511,22 +403,11 @@ function updateMetricsDashboard() {
     ? Math.round(quizDepois.reduce((acc, cur) => acc + cur.percentual, 0) / quizDepois.length) 
     : 0;
 
-  // Satisfação (Excelente + Bom)
-  let positivas = 0;
-  let pretendemMudar = 0;
-  avaliacoes.forEach(a => {
-    if (a.clarezaSite === "excelente" || a.clarezaSite === "bom") positivas++;
-    if (a.intencaoSeparar === "sim_total" || a.intencaoSeparar === "provavelmente") pretendemMudar++;
-  });
-
-  const satPercent = avaliacoes.length ? Math.round((positivas / avaliacoes.length) * 100) : 0;
-  const mudancaPercent = avaliacoes.length ? Math.round((pretendemMudar / avaliacoes.length) * 100) : 0;
-
   // Atualiza DOM
   setTextSafe("dashVisitas", visits);
-  setTextSafe("dashTotalAvaliacoes", avaliacoes.length);
   setTextSafe("dashTotalQuizzes", totalQuizzes);
-  setTextSafe("dashSatisfacao", `${satPercent}%`);
+  setTextSafe("dashQuizzesAntes", quizAntes.length);
+  setTextSafe("dashQuizzesDepois", quizDepois.length);
 
   // Barra de progresso comparativa
   const barAntes = document.getElementById("dashBarAntes");
@@ -551,7 +432,7 @@ function updateMetricsDashboard() {
     elEvol.style.color = diffPts >= 0 ? "#16a34a" : "#dc2626";
   }
 
-  setTextSafe("dashIntencaoMudar", `${mudancaPercent}%`);
+  setTextSafe("dashMediaDepois", `${mediaDepois}%`);
 }
 
 function setTextSafe(id, val) {
@@ -563,7 +444,7 @@ function setTextSafe(id, val) {
 const btnMockData = document.getElementById("btnMockData");
 if (btnMockData) {
   btnMockData.addEventListener("click", () => {
-    if (!confirm("Deseja carregar 35 respostas simuladas de uma turma de extensão universitária para visualizar os gráficos completos?")) return;
+    if (!confirm("Deseja carregar 30 testes simulados (antes e depois) para visualizar os gráficos e métricas completos?")) return;
 
     localStorage.setItem("recicla_visits", "148");
 
@@ -583,28 +464,9 @@ if (btnMockData) {
     }
     localStorage.setItem("recicla_quiz_depois", JSON.stringify(mockDepois));
 
-    const mockAvaliacoes = [
-      { id: "1", faixaEtaria: "18-25", separavaAntes: "as_vezes", clarezaSite: "excelente", intencaoSeparar: "sim_total", comentario: "Muito esclarecedor sobre caixa de pizza e vidro quebrado." },
-      { id: "2", faixaEtaria: "26-40", separavaAntes: "nao", clarezaSite: "excelente", intencaoSeparar: "sim_total", comentario: "Não sabia que o óleo contamina tanto. Agora vou guardar na garrafa PET." },
-      { id: "3", faixaEtaria: "18-25", separavaAntes: "sim", clarezaSite: "bom", intencaoSeparar: "sim_total", comentario: "Excelente iniciativa para a nossa comunidade!" },
-      { id: "4", faixaEtaria: "41-60", separavaAntes: "nao", clarezaSite: "bom", intencaoSeparar: "provavelmente", comentario: "Gostei da lista dos pontos de coleta da nossa cidade." },
-      { id: "5", faixaEtaria: "mais_60", separavaAntes: "as_vezes", clarezaSite: "excelente", intencaoSeparar: "sim_total", comentario: "Muito fácil de navegar no celular." }
-    ];
-    for (let i = 6; i <= 32; i++) {
-      mockAvaliacoes.push({
-        id: i.toString(),
-        faixaEtaria: ["ate_18", "18-25", "26-40", "41-60"][Math.floor(Math.random() * 4)],
-        separavaAntes: ["sim", "nao", "as_vezes"][Math.floor(Math.random() * 3)],
-        clarezaSite: ["excelente", "excelente", "bom", "regular"][Math.floor(Math.random() * 4)],
-        intencaoSeparar: ["sim_total", "sim_total", "provavelmente"][Math.floor(Math.random() * 3)],
-        comentario: "Participação comunitária no projeto de extensão universitária."
-      });
-    }
-    localStorage.setItem("recicla_avaliacoes", JSON.stringify(mockAvaliacoes));
-
     updateMetricsDashboard();
     renderQuizComparativo();
-    alert("Dados de demonstração carregados com sucesso! O painel de métricas agora reflete uma ação de extensão com 30+ participantes.");
+    alert("Dados de demonstração carregados com sucesso! O painel de métricas agora reflete as notas de 30 participantes no pré e pós-teste.");
   });
 }
 
@@ -612,11 +474,10 @@ if (btnMockData) {
 const btnResetData = document.getElementById("btnResetData");
 if (btnResetData) {
   btnResetData.addEventListener("click", () => {
-    if (confirm("Tem certeza que deseja zerar os dados coletados de testes e avaliações?")) {
+    if (confirm("Tem certeza que deseja zerar os dados de testes e métricas?")) {
       localStorage.setItem("recicla_visits", "1");
       localStorage.setItem("recicla_quiz_antes", "[]");
       localStorage.setItem("recicla_quiz_depois", "[]");
-      localStorage.setItem("recicla_avaliacoes", "[]");
       updateMetricsDashboard();
       renderQuizComparativo();
       alert("Dados zerados.");
@@ -633,37 +494,25 @@ if (btnExportCSV) {
 }
 
 function exportToCSV() {
-  const avaliacoes = JSON.parse(localStorage.getItem("recicla_avaliacoes") || "[]");
   const quizAntes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
   const quizDepois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
-  const studentInfo = JSON.parse(localStorage.getItem("recicla_student_info") || "{}");
 
-  if (avaliacoes.length === 0 && quizAntes.length === 0 && quizDepois.length === 0) {
-    alert("Não há dados coletados para exportar ainda. Responda ao quiz ou questionário, ou carregue dados de demonstração.");
+  if (quizAntes.length === 0 && quizDepois.length === 0) {
+    alert("Não há dados de testes para exportar ainda. Responda ao quiz ou carregue dados de demonstração.");
     return;
   }
 
   let csvContent = "\uFEFF"; // BOM para acentos no Excel em português
-  csvContent += "RELATORIO DE METRICAS - PROJETO DE EXTENSAO RECICLA CONSCIENTE\n";
-  csvContent += `Aluno(a):;${studentInfo.aluno || "Ingrid"};Curso:;${studentInfo.curso || ""}\n`;
-  csvContent += `Instituicao:;${studentInfo.instituicao || ""};Orientador(a):;${studentInfo.orientador || ""}\n`;
+  csvContent += "RELATORIO DE METRICAS - PROJETO RECICLA CONSCIENTE\n";
   csvContent += `Data de Exportacao:;${new Date().toLocaleDateString('pt-BR')}\n\n`;
 
   csvContent += "=== RESUMO DAS METRICAS ===\n";
   csvContent += `Total de Visitantes Unicos (Acessos):;${localStorage.getItem("recicla_visits") || 1}\n`;
-  csvContent += `Total de Formularios de Avaliacao:;${avaliacoes.length}\n`;
-  csvContent += `Testes no Quiz - Antes:;${quizAntes.length}\n`;
-  csvContent += `Testes no Quiz - Depois:;${quizDepois.length}\n\n`;
+  csvContent += `Total de Quizzes Concluidos:;${quizAntes.length + quizDepois.length}\n`;
+  csvContent += `Testes no Quiz - Antes (Diagnostico):;${quizAntes.length}\n`;
+  csvContent += `Testes no Quiz - Depois (Pos-Uso):;${quizDepois.length}\n\n`;
 
-  csvContent += "=== RESPOSTAS DO QUESTIONARIO DE IMPACTO ===\n";
-  csvContent += "ID;Data;Faixa Etaria;Separava Residuos Antes?;Avaliacao do Site;Intencao de Praticar Reciclagem;Comentarios\n";
-
-  avaliacoes.forEach(a => {
-    const com = (a.comentario || "").replace(/;/g, " ").replace(/\n/g, " ");
-    csvContent += `${a.id};${a.data};${a.faixaEtaria};${a.separavaAntes};${a.clarezaSite};${a.intencaoSeparar};"${com}"\n`;
-  });
-
-  csvContent += "\n=== RESULTADOS DO QUIZ (APRENDIZAGEM) ===\n";
+  csvContent += "=== RESULTADOS DO QUIZ (APRENDIZAGEM) ===\n";
   csvContent += "Etapa;Data;Acertos;Total;Aproveitamento (%)\n";
   quizAntes.forEach(q => {
     csvContent += `Antes (Diagnostico);${q.data};${q.acertos};${q.total};${q.percentual}%\n`;
@@ -676,14 +525,14 @@ function exportToCSV() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", `Relatorio_Extensao_ReciclaConsciente_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute("download", `Resultados_Quiz_ReciclaConsciente_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 }
 
 // ==========================================
-// 7. EVENTOS GERAIS DE NAVEGAÇÃO E UX
+// 6. EVENTOS GERAIS DE NAVEGAÇÃO E UX
 // ==========================================
 function initNavEvents() {
   const menuBtn = document.querySelector(".mobile-menu-btn");
