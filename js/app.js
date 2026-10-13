@@ -213,57 +213,13 @@ function renderCidadeResultados(cidade) {
 
   const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent('ecoponto ou cooperativa de reciclagem em ' + cidade)}`;
 
-  // Gerar os cards dos canais oficiais para a cidade
-  const canaisHtml = (RECICLA_DATA.canaisOficiais || []).map(canal => {
-    let linkAcao = "#";
-    let btnTexto = canal.btnTexto;
-
-    if (canal.tipoAcao === "prefeitura") {
-      linkAcao = `https://www.google.com/search?q=${encodeURIComponent('coleta seletiva prefeitura ' + cidade)}`;
-      btnTexto = `Consultar Coleta em ${escapeHtml(cidade)} ↗`;
-    } else if (canal.tipoAcao === "maps-cooperativas") {
-      linkAcao = `https://www.google.com/maps/search/${encodeURIComponent('cooperativa de reciclagem em ' + cidade)}`;
-      btnTexto = `Ver Cooperativas em ${escapeHtml(cidade)} no Mapa ↗`;
-    } else if (canal.tipoAcao === "maps-oleo") {
-      linkAcao = `https://www.google.com/maps/search/${encodeURIComponent('descarte de oleo de cozinha em ' + cidade)}`;
-      btnTexto = `Ver Pontos de Óleo em ${escapeHtml(cidade)} ↗`;
-    } else if (canal.linkUrl) {
-      linkAcao = canal.linkUrl;
-    }
-
-    return `
-      <div class="canal-card">
-        <div>
-          <div class="canal-top">
-            <div class="canal-icon">${canal.icone}</div>
-            <div class="canal-titulos">
-              <span class="canal-badge ${canal.badgeClass}">${escapeHtml(canal.categoriaBadge)}</span>
-              <h4>${escapeHtml(canal.titulo)}</h4>
-            </div>
-          </div>
-          <div class="canal-body">
-            <p>${escapeHtml(canal.descricao)}</p>
-            <div class="canal-dica">
-              <strong>💡 Orientação:</strong> ${escapeHtml(canal.dica)}
-            </div>
-          </div>
-        </div>
-        <div>
-          <a href="${linkAcao}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary canal-btn">
-            ${btnTexto}
-          </a>
-        </div>
-      </div>
-    `;
-  }).join("");
-
   container.innerHTML = `
     <!-- CABEÇALHO DA CIDADE SELECIONADA -->
     <div class="cidade-header-bar">
       <div>
         <span class="cidade-status-badge">📍 CIDADE SELECIONADA</span>
-        <h3>Ecopontos e Canais de Descarte em ${escapeHtml(cidade)}</h3>
-        <p>Canais oficiais regulamentados pela Política Nacional de Resíduos Sólidos (Lei nº 12.305/2010).</p>
+        <h3>Pontos de Reciclagem em ${escapeHtml(cidade)}</h3>
+        <p>Acesse o mapa oficial do Google Maps com todos os ecopontos e cooperativas abertos na sua cidade.</p>
       </div>
       <button id="btnLimparCidade" class="btn btn-secondary" type="button" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
         ✏️ Trocar Cidade
@@ -275,22 +231,17 @@ function renderCidadeResultados(cidade) {
       <div class="map-city-content">
         <h4>🗺️ Mapa de Ecopontos e Cooperativas em ${escapeHtml(cidade)}</h4>
         <p>
-          Acesse a busca em tempo real do Google Maps para explorar todos os ecopontos municipais, galpões de triagem de cooperativas e caçambas oficiais abertas em <strong>${escapeHtml(cidade)}</strong>, com fotos, telefones, horários de funcionamento e rotas pelo GPS.
+          Abra a busca interativa no Google Maps para ver os ecopontos municipais, pontos de entrega voluntária e cooperativas de reciclagem em <strong>${escapeHtml(cidade)}</strong>, com rotas, endereços, horários de funcionamento e telefones atualizados em tempo real.
         </p>
       </div>
       <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-maps-large">
-        Abrir Ecopontos de ${escapeHtml(cidade)} no Maps ↗
+        Abrir Mapa de ${escapeHtml(cidade)} no Google Maps ↗
       </a>
     </div>
 
-    <!-- GRID DE CANAIS OFICIAIS DINÂMICOS POR MATERIAL -->
-    <div class="canais-grid">
-      ${canaisHtml}
-    </div>
-
-    <!-- DICA DE CIDADANIA E ENGAJAMENTO -->
+    <!-- DICA DE CIDADANIA -->
     <div class="pontos-notice">
-      <strong>💡 Dica Comunitária para Moradores de ${escapeHtml(cidade)}:</strong> O descarte em ecopontos públicos municipais é 100% gratuito e protege os córregos e terrenos do município contra o descarte clandestino. Entregar os recicláveis secos limpos a cooperativas gera trabalho e renda digna para os catadores da sua cidade!
+      <strong>💡 Dica Comunitária:</strong> No Google Maps você pode filtrar por locais abertos agora, conferir avaliações de outros moradores e traçar rotas a pé, de bicicleta ou de transporte público para entregar seus recicláveis com praticidade.
     </div>
   `;
 
@@ -310,7 +261,7 @@ function renderCidadeEmptyState() {
       <div class="empty-icon">🏙️</div>
       <h3>Onde descartar na sua cidade?</h3>
       <p>
-        A coleta seletiva e os ecopontos são organizados de forma autônoma por cada município brasileiro. Digite o nome da sua cidade no campo acima ou clique em uma das cidades sugeridas para abrir o mapa em tempo real e consultar os canais oficiais de descarte ecológico da sua região.
+        Digite o nome da sua cidade no campo acima ou clique em uma das cidades sugeridas para abrir o mapa em tempo real com todos os ecopontos e cooperativas da sua região.
       </p>
     </div>
   `;
