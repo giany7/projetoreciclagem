@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recicla Consciente | Projeto de Extensão Universitária (ODS 12 & 11)</title>
+  <meta name="description" content="Plataforma educativa de extensão universitária para conscientização ambiental, guia de separação de resíduos, mapa de ecopontos e avaliação de impacto comunitário.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#inicio" class="logo-area">
+        <span class="logo-icon">♻️</span>
+        <div class="logo-text">
+          <h1>Recicla Consciente</h1>
+          <span>Projeto de Extensão Universitária • ODS 12</span>
+        </div>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Abrir menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="#guia" class="nav-link">Guia de Descarte</a></li>
+        <li><a href="#onde-descartar" class="nav-link">Onde Descartar</a></li>
+        <li><a href="#quiz" class="nav-link">Quiz Educativo</a></li>
+        <li><a href="#avaliacao" class="nav-link">Questionário</a></li>
+        <li><a href="#metricas" class="nav-link">Painel do Aluno</a></li>
+        <li><a href="#sobre" class="nav-link">Sobre o Projeto</a></li>
+        <li><a href="#quiz" class="nav-link btn-nav-action">Fazer Quiz</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <header id="inicio" class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span>🌱</span> Extensão Comunitária • Alinhado aos ODS da ONU
+        </div>
+        <h2 class="hero-title">
+          Tecnologia e Educação Ambiental para <span>transformar a nossa comunidade</span>.
+        </h2>
+        <p class="hero-desc">
+          Aprenda o que realmente é reciclável, descubra como preparar embalagens sem desperdício de água, encontre pontos de entrega verificados e teste seus conhecimentos.
+        </p>
+        <div class="hero-actions">
+          <a href="#guia" class="btn btn-primary">🔍 Consultar Guia de Resíduos</a>
+          <a href="#quiz" class="btn btn-secondary">📝 Fazer o Quiz de Descarte</a>
+          <a href="#metricas" class="btn btn-accent">📊 Ver Métricas do Projeto</a>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-num">ODS 12.5</span>
+          <span class="stat-label">Redução substancial da geração de resíduos até 2030.</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">ODS 12.8</span>
+          <span class="stat-label">Acesso à informação para estilos de vida em harmonia com a natureza.</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">+98%</span>
+          <span class="stat-label">Do alumínio no Brasil é reciclado graças à triagem e aos catadores.</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">1 Litro</span>
+          <span class="stat-label">De óleo de cozinha pode poluir até 25.000 litros de água limpa.</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. GUIA DO QUE PODE SER RECICLADO -->
+  <section id="guia" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Guia Prático e Confiável</span>
+        <h2 class="section-title">O que Pode e Não Pode ser Reciclado?</h2>
+        <p class="section-desc">
+          Muitos erros acontecem por falta de orientação clara nas embalagens. Consulte o material abaixo para descartar com responsabilidade.
+        </p>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input type="text" id="materialSearch" placeholder="Pesquise por nome (ex: caixa de pizza, espelho, remédio, óleo)...">
+        </div>
+
+        <div class="category-tags">
+          <button class="cat-btn active" data-category="todos">Todos os Materiais</button>
+          <button class="cat-btn" data-category="papel">📄 Papel & Papelão</button>
+          <button class="cat-btn" data-category="plastico">🧴 Plásticos</button>
+          <button class="cat-btn" data-category="vidro">🍾 Vidros</button>
+          <button class="cat-btn" data-category="metal">🥫 Metais</button>
+          <button class="cat-btn" data-category="especial">🔋 Especiais & Eletrônicos</button>
+        </div>
+      </div>
+
+      <div class="materials-grid" id="materialsContainer">
+        <!-- Renderizado dinamicamente pelo app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ONDE DESCARTAR (PONTOS DE COLETA) -->
+  <section id="onde-descartar" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Destinação Certa</span>
+        <h2 class="section-title">Onde Descartar na Nossa Comunidade?</h2>
+        <p class="section-desc">
+          Locais oficiais, cooperativas de catadores e pontos de entrega voluntária (PEV). Verifique sempre os materiais aceitos antes de levar.
+        </p>
+      </div>
+
+      <div class="filter-bar" style="margin-bottom: 2rem;">
+        <div class="category-tags">
+          <button class="cat-btn ponto-filter-btn active" data-category="todos">Todos os Locais</button>
+          <button class="cat-btn ponto-filter-btn" data-category="papel">Papel e Plástico</button>
+          <button class="cat-btn ponto-filter-btn" data-category="vidro">Vidros</button>
+          <button class="cat-btn ponto-filter-btn" data-category="metal">Metais</button>
+          <button class="cat-btn ponto-filter-btn" data-category="especial">Pilhas, Remédios & Óleo</button>
+        </div>
+      </div>
+
+      <div class="pontos-grid" id="pontosContainer">
+        <!-- Renderizado dinamicamente pelo app.js -->
+      </div>
+
+      <div class="pontos-notice">
+        <strong>💡 Dica para o seu projeto de extensão:</strong> Este catálogo pode ser ajustado com os ecopontos e cooperativas reais do seu município ou bairro, fortalecendo a parceria direta da faculdade com o poder público e as associações de catadores locais.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. QUIZ DE RECICLAGEM COM ANTES & DEPOIS -->
+  <section id="quiz" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Aprendizagem Interativa</span>
+        <h2 class="section-title">Quiz de Conhecimento Ambiental</h2>
+        <p class="section-desc">
+          Responda a perguntas do dia a dia sobre separação de resíduos. O sistema permite testar o conhecimento <strong>antes</strong> de consultar o site e <strong>depois</strong>, medindo a evolução real do aprendizado.
+        </p>
+      </div>
+
+      <div class="quiz-wrapper">
+        <div class="quiz-mode-selector">
+          <button id="btnModoAntes" class="quiz-mode-btn active" title="Teste de entrada para diagnosticar conhecimento prévio">
+            1️⃣ Diagnóstico Inicial (Antes)
+          </button>
+          <button id="btnModoDepois" class="quiz-mode-btn" title="Teste de saída para avaliar o que foi aprendido">
+            2️⃣ Avaliação Final (Depois)
+          </button>
+        </div>
+
+        <div id="quizActiveBox">
+          <div class="quiz-header">
+            <span id="quizCounter">Pergunta 1 de 10</span>
+            <span id="quizModeBadge" style="font-size: 0.8rem; font-weight: 700; color: #475569;">
+              MODO: Diagnóstico Inicial (Antes)
+            </span>
+          </div>
+
+          <div class="quiz-progress-bar">
+            <div id="quizProgressFill" class="quiz-progress-fill"></div>
+          </div>
+
+          <div class="quiz-question-box">
+            <h3 id="quizQuestionText">Carregando pergunta...</h3>
+            <div class="quiz-options" id="quizOptionsContainer">
+              <!-- Botões de opção gerados via JS -->
+            </div>
+            <div id="quizFeedback" class="quiz-feedback"></div>
+          </div>
+
+          <div class="quiz-footer">
+            <button id="btnQuizNext" class="btn btn-primary" style="display: none;">
+              Próxima Pergunta →
+            </button>
+          </div>
+        </div>
+
+        <!-- Tela de Resultado do Quiz -->
+        <div id="quizResultBox" class="quiz-result-box">
+          <span style="font-size: 3rem;">🎯</span>
+          <h3 style="font-size: 1.5rem; color: #0f172a; margin-top: 0.5rem;">Resultado do Quiz</h3>
+          <div class="quiz-result-score" id="quizScoreDisplay">0%</div>
+          <p id="quizScoreFraction" style="font-weight: 600; color: #475569; margin-bottom: 0.75rem;">Você acertou 0 de 10 questões.</p>
+          <p class="quiz-result-msg" id="quizResultMessage"></p>
+
+          <div id="quizComparativoView" class="quiz-comparativo" style="display: none;"></div>
+
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button id="btnQuizRestart" class="btn btn-secondary">🔄 Refazer Teste</button>
+            <a href="#avaliacao" class="btn btn-primary">📋 Avaliar o Projeto</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. QUESTIONÁRIO DE AVALIAÇÃO COMUNITÁRIA -->
+  <section id="avaliacao" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Impacto e Percepção Comunitária</span>
+        <h2 class="section-title">Questionário de Avaliação da Ação</h2>
+        <p class="section-desc">
+          Este formulário é a ferramenta de validação da extensão universitária. Ele coleta dados anônimos sobre hábitos prévios, clareza das informações e intenção de engajamento da comunidade.
+        </p>
+      </div>
+
+      <div class="form-card">
+        <div id="formSuccessMsg" style="display: none; background: #dcfce7; border-left: 4px solid #16a34a; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; color: #14532d;">
+          <h4 style="font-weight: 700; margin-bottom: 0.35rem;">✅ Resposta registrada com sucesso!</h4>
+          <p style="font-size: 0.9rem;">Muito obrigado por contribuir com a pesquisa e com as métricas do nosso projeto de extensão comunitária.</p>
+        </div>
+
+        <form id="formAvaliacaoImpacto">
+          <div class="form-group">
+            <label for="faixaEtaria">1. Qual a sua faixa etária?</label>
+            <select id="faixaEtaria" name="faixaEtaria" required>
+              <option value="">Selecione uma opção...</option>
+              <option value="ate_18">Menos de 18 anos</option>
+              <option value="18-25">18 a 25 anos (jovem universitário / estudante)</option>
+              <option value="26-40">26 a 40 anos</option>
+              <option value="41-60">41 a 60 anos</option>
+              <option value="mais_60">Mais de 60 anos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>2. Você já costumava separar materiais recicláveis em sua casa antes de conhecer este site?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="separavaAntes" value="sim" required> Sim, separava a maioria dos recicláveis.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="separavaAntes" value="as_vezes"> Às vezes, apenas latinhas ou caixas grandes.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="separavaAntes" value="nao"> Não separava ou tinha muitas dúvidas sobre como fazer.
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>3. O conteúdo e o guia de descarte do site foram claros e fáceis de compreender?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="clarezaSite" value="excelente" required> Excelente, tirou dúvidas práticas importantes (ex: caixas de pizza, vidro quebrado).
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="clarezaSite" value="bom"> Bom, conteúdo útil e bem organizado.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="clarezaSite" value="regular"> Regular, ainda fiquei com dúvidas.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="clarezaSite" value="ruim"> Ruim ou confuso.
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>4. Após utilizar o site e o quiz, você pretende adotar ou melhorar a separação do lixo na sua rotina?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="intencaoSeparar" value="sim_total" required> Sim, com certeza vou começar ou aprimorar a separação.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="intencaoSeparar" value="provavelmente"> Provavelmente sim.
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="intencaoSeparar" value="pouco_provavel"> Pouco provável ou ainda não sei onde levar.
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="comentario">5. Deixe uma observação, crítica ou sugestão para a equipe do projeto:</label>
+            <textarea id="comentario" name="comentario" rows="3" placeholder="O que você mais gostou ou o que podemos adicionar (ex: novos pontos de coleta na sua rua)?"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1rem;">
+            📤 Enviar Avaliação do Projeto
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. PAINEL DE MÉTRICAS DO ALUNO / EXTENSÃO -->
+  <section id="metricas" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Evidências para o Relatório Acadêmico</span>
+        <h2 class="section-title">Painel de Métricas da Ação de Extensão</h2>
+        <p class="section-desc">
+          Este painel consolida os indicadores exigidos pelas faculdades: alcance público, taxa de aprendizagem (pré vs pós-teste) e índice de intenção de mudança comportamental.
+        </p>
+      </div>
+
+      <div class="metrics-dashboard">
+        <div class="metrics-summary-grid">
+          <div class="metric-box">
+            <div class="metric-val" id="dashVisitas">0</div>
+            <div class="metric-desc">Visualizações do Site</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="dashTotalAvaliacoes">0</div>
+            <div class="metric-desc">Questionários Respondidos</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="dashTotalQuizzes">0</div>
+            <div class="metric-desc">Quizzes Concluídos</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="dashSatisfacao">0%</div>
+            <div class="metric-desc">Avaliação Positiva do Site</div>
+          </div>
+        </div>
+
+        <div class="metrics-analysis">
+          <h4>📈 Métrica 2: Avaliação de Aprendizagem (Quiz Antes vs Depois)</h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+            Compara a pontuação média dos participantes no teste diagnóstico inicial com a pontuação após consultarem as informações e o guia do projeto:
+          </p>
+
+          <div class="progress-compare-item">
+            <div class="progress-compare-labels">
+              <span>Diagnóstico Inicial (Antes)</span>
+              <span id="dashValAntes">0% (0 testes)</span>
+            </div>
+            <div class="progress-compare-bar">
+              <div id="dashBarAntes" class="progress-compare-inner bar-antes" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="progress-compare-item">
+            <div class="progress-compare-labels">
+              <span>Avaliação de Saída (Depois)</span>
+              <span id="dashValDepois">0% (0 testes)</span>
+            </div>
+            <div class="progress-compare-bar">
+              <div id="dashBarDepois" class="progress-compare-inner bar-depois" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Ganho Pedagógico Médio:</div>
+              <div id="dashEvolucaoPontos" style="font-size: 1.5rem; font-weight: 800; color: #16a34a;">0 p.p.</div>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Intenção de Mudança de Hábitos:</div>
+              <div id="dashIntencaoMudar" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-actions">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button id="btnExportCSV" class="btn btn-primary">
+              💾 Exportar Relatório para Excel (CSV)
+            </button>
+            <button id="btnMockData" class="btn btn-secondary" title="Carrega dados fictícios para testar a visualização e apresentação acadêmica">
+              ⚡ Carregar Dados de Demonstração (30+ respostas)
+            </button>
+          </div>
+          <button id="btnResetData" class="btn btn-outline-danger">
+            🗑️ Zerar Métricas
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. SOBRE O PROJETO & RELATÓRIO ACADÊMICO -->
+  <section id="sobre" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">Estrutura Curricular</span>
+        <h2 class="section-title">Sobre o Projeto de Extensão Universitária</h2>
+        <p class="section-desc">
+          Desenvolvido em conformidade com as diretrizes do Ministério da Educação (MEC) para a Curricularização da Extensão no Ensino Superior (Resolução CNE/CES nº 7/2018).
+        </p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-card">
+          <h3 style="font-size: 1.35rem; color: #064e3b; margin-bottom: 0.75rem;">Objetivos e Metodologia</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
+            O projeto <strong>Recicla Consciente</strong> foi criado para suprir o gargalo de desinformação pública sobre separação de resíduos sólidos urbanos, facilitando o diálogo entre cidadãos, cooperativas de catadores e a cadeia de reciclagem local.
+          </p>
+
+          <h4 style="font-size: 1rem; margin-top: 1.25rem; margin-bottom: 0.5rem;">Objetivos Centrais da Ação:</h4>
+          <ul style="list-style: square; padding-left: 1.25rem; font-size: 0.925rem; color: var(--text-secondary); line-height: 1.7;">
+            <li>Promover a educação ambiental acessível por meio de ferramenta digital interativa.</li>
+            <li>Divulgar e incentivar o uso dos pontos de entrega voluntária e cooperativas locais.</li>
+            <li>Desmistificar erros cotidianos (contaminação por gordura, riscos com vidros pontiagudos).</li>
+            <li>Mensurar cientificamente o impacto pedagógico e a intenção de mudança de atitude.</li>
+          </ul>
+
+          <div class="ods-badges">
+            <div class="ods-pill ods-12">
+              <span class="ods-num">12</span>
+              <span>ODS 12: Consumo e Produção Responsáveis (Metas 12.5 e 12.8)</span>
+            </div>
+            <div class="ods-pill ods-11">
+              <span class="ods-num">11</span>
+              <span>ODS 11: Cidades e Comunidades Sustentáveis</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h3 style="font-size: 1.35rem; color: #064e3b;">Ficha do Acadêmico</h3>
+            <button id="btnOpenConfig" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+              ✏️ Personalizar Dados
+            </button>
+          </div>
+
+          <div class="team-info-box">
+            <h4>Estudante Responsável:</h4>
+            <p id="displayAluno" style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">Ingrid</p>
+
+            <h4 style="margin-top: 0.75rem;">Curso:</h4>
+            <p id="displayCurso" style="color: var(--text-secondary);">Graduação / Ensino Superior</p>
+
+            <h4 style="margin-top: 0.75rem;">Instituição de Ensino Superior:</h4>
+            <p id="displayInstituicao" style="color: var(--text-secondary);">Universidade / Faculdade</p>
+
+            <h4 style="margin-top: 0.75rem;">Orientação Docente:</h4>
+            <p id="displayOrientador" style="color: var(--text-secondary);">Prof. Orientador(a)</p>
+          </div>
+
+          <div style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            <strong>Base legal e referencial teórico:</strong>
+            Política Nacional de Resíduos Sólidos (PNRS - Lei nº 12.305/2010), Resoluções CONAMA e Objetivos de Desenvolvimento Sustentável das Nações Unidas (Agenda 2030).
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE PERSONALIZAÇÃO DOS DADOS DO ALUNO -->
+  <div id="configModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.2rem; color: #0f172a;">Personalizar Ficha do Estudante</h3>
+        <button id="btnCloseConfig" class="modal-close-btn">&times;</button>
+      </div>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Insira seus dados para que o site e o relatório exportado em CSV contenham o seu nome e as informações da sua faculdade.
+      </p>
+
+      <div class="form-group">
+        <label for="inputNomeAluno">Seu Nome Completo:</label>
+        <input type="text" id="inputNomeAluno" placeholder="Ex: Ingrid Silva">
+      </div>
+      <div class="form-group">
+        <label for="inputCurso">Seu Curso Universitário:</label>
+        <input type="text" id="inputCurso" placeholder="Ex: Análise e Desenv. de Sistemas / Eng. Ambiental / Pedagogia">
+      </div>
+      <div class="form-group">
+        <label for="inputInstituicao">Nome da Faculdade / Universidade:</label>
+        <input type="text" id="inputInstituicao" placeholder="Ex: Universidade Federal / Estácio / Unip / PUC">
+      </div>
+      <div class="form-group">
+        <label for="inputOrientador">Nome do Professor Orientador:</label>
+        <input type="text" id="inputOrientador" placeholder="Ex: Prof. Dr. Carlos Souza">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+        <button id="btnSaveConfig" class="btn btn-primary">Salvar Informações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Recicla Consciente</h4>
+        <p>
+          Projeto de Extensão Universitária voltado à promoção da sustentabilidade e ao cumprimento da Agenda 2030 da ONU no Brasil. O projeto atua unindo cidadãos, tecnologia acessível e valorização dos trabalhadores da reciclagem.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Links Rápidos</h4>
+        <ul class="footer-links">
+          <li><a href="#guia">Guia de Separação</a></li>
+          <li><a href="#onde-descartar">Pontos de Coleta</a></li>
+          <li><a href="#quiz">Quiz Interativo</a></li>
+          <li><a href="#avaliacao">Formulário de Pesquisa</a></li>
+          <li><a href="#metricas">Painel de Resultados</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Fontes Oficiais</h4>
+        <ul class="footer-links">
+          <li><a href="https://brasil.un.org/pt-br/sdgs/12" target="_blank" rel="noopener">ONU Brasil - ODS 12</a></li>
+          <li><a href="https://brasil.un.org/pt-br/sdgs/11" target="_blank" rel="noopener">ONU Brasil - ODS 11</a></li>
+          <li><a href="https://www.gov.br/mma/pt-br" target="_blank" rel="noopener">Ministério do Meio Ambiente</a></li>
+          <li><a href="http://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12305.htm" target="_blank" rel="noopener">Lei PNRS 12.305/2010</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>Recicla Consciente © 2026 • Projeto de Extensão Comunitária Acadêmica</div>
+      <div>Desenvolvido com foco no impacto social e ambiental real.</div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
