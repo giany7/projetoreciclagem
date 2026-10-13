@@ -593,69 +593,17 @@ function setTextSafe(id, val) {
   if (el) el.textContent = val;
 }
 
-// Botão para Popular Dados de Demonstração (Mock para Apresentação Acadêmica)
-const btnMockData = document.getElementById("btnMockData");
-if (btnMockData) {
-  btnMockData.addEventListener("click", () => {
-    if (!confirm("Deseja carregar 30 testes simulados (antes e depois) para visualizar os gráficos e métricas completos?")) return;
-
-    localStorage.setItem("recicla_visits", "148");
-
-    const mockAntes = [];
-    for (let i = 0; i < 30; i++) {
-      // Notas entre 40% e 60%
-      const nota = Math.floor(Math.random() * 25) + 40;
-      mockAntes.push({ data: new Date().toISOString(), percentual: nota, acertos: Math.round(nota/10), total: 10 });
-    }
-    localStorage.setItem("recicla_quiz_antes", JSON.stringify(mockAntes));
-
-    const mockDepois = [];
-    for (let i = 0; i < 30; i++) {
-      // Notas entre 75% e 95%
-      const nota = Math.floor(Math.random() * 25) + 75;
-      mockDepois.push({ data: new Date().toISOString(), percentual: nota, acertos: Math.round(nota/10), total: 10 });
-    }
-    localStorage.setItem("recicla_quiz_depois", JSON.stringify(mockDepois));
-
-    updateMetricsDashboard();
-    renderQuizComparativo();
-    alert("Dados de demonstração carregados com sucesso! O painel de métricas agora reflete as notas de 30 participantes no pré e pós-teste.");
-  });
-}
-
-// Botão para Resetar Dados
-const btnResetData = document.getElementById("btnResetData");
-if (btnResetData) {
-  btnResetData.addEventListener("click", () => {
-    if (confirm("Tem certeza que deseja zerar os dados de testes e métricas?")) {
-      localStorage.setItem("recicla_visits", "1");
-      localStorage.setItem("recicla_quiz_antes", "[]");
-      localStorage.setItem("recicla_quiz_depois", "[]");
-      updateMetricsDashboard();
-      renderQuizComparativo();
-      alert("Dados zerados.");
-    }
-  });
-}
-
-// Botão para Exportar Relatório em CSV (para anexar ao relatório acadêmico)
-const btnExportCSV = document.getElementById("btnExportCSV");
-if (btnExportCSV) {
-  btnExportCSV.addEventListener("click", () => {
-    exportToCSV();
-  });
-}
-
-function exportToCSV() {
+// Função utilitária para exportação técnica via console caso necessário (window.exportarMetricasCSV())
+window.exportarMetricasCSV = function() {
   const quizAntes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
   const quizDepois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
 
   if (quizAntes.length === 0 && quizDepois.length === 0) {
-    alert("Não há dados de testes para exportar ainda. Responda ao quiz ou carregue dados de demonstração.");
+    alert("Não há dados de testes para exportar ainda.");
     return;
   }
 
-  let csvContent = "\uFEFF"; // BOM para acentos no Excel em português
+  let csvContent = "\uFEFF";
   csvContent += "RELATORIO DE METRICAS - PROJETO RECICLA CONSCIENTE\n";
   csvContent += `Data de Exportacao:;${new Date().toLocaleDateString('pt-BR')}\n\n`;
 
@@ -682,7 +630,7 @@ function exportToCSV() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
+};
 
 // ==========================================
 // 6. EVENTOS GERAIS DE NAVEGAÇÃO E UX
