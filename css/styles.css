@@ -495,121 +495,146 @@ body {
   margin-top: 0.75rem;
 }
 
-/* ONDE DESCARTAR */
-.location-toolbar {
+/* ONDE DESCARTAR - BUSCA POR CIDADE */
+.cidade-search-card {
   background: white;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-.location-toolbar-main {
+.cidade-input-row {
   display: flex;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
-.btn-geo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.35rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.btn-geo.active {
-  background-color: var(--primary-dark);
-}
-
-.btn-geo .geo-icon {
-  font-size: 1.15rem;
-}
-
-.location-search-wrap {
+.cidade-input-wrap {
   flex: 1;
   min-width: 280px;
+  position: relative;
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
 }
 
-.location-search-wrap input {
-  flex: 1;
-  padding: 0.75rem 1rem;
+.cidade-input-wrap .cidade-icon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+.cidade-input-wrap input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 3rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 0.925rem;
+  border-radius: 10px;
+  font-size: 1rem;
   outline: none;
   transition: var(--transition);
 }
 
-.location-search-wrap input:focus {
+.cidade-input-wrap input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.15);
 }
 
-.location-status-banner {
-  background-color: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  font-size: 0.9rem;
-  color: #166534;
-  animation: fadeIn 0.25s ease;
+.btn-search-cidade {
+  padding: 0.85rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.location-status-content {
+.cidade-chips-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.chips-label {
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.chip-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.chip-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ÁREA DINÂMICA DE RESULTADOS */
+.cidade-header-bar {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--border-radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
-.btn-link-reset {
-  background: none;
-  border: none;
-  color: #0d6936;
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
-  padding: 0;
+.cidade-status-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #166534;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
 }
 
-.ponto-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.4rem;
-}
-
-.badge-distancia {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background-color: #dcfce7;
-  color: #15803d;
-  font-size: 0.775rem;
+.cidade-header-bar h3 {
+  font-size: 1.35rem;
   font-weight: 700;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
-  border: 1px solid #bbf7d0;
+  color: #064e3b;
+  margin-bottom: 0.25rem;
 }
 
-/* BANNER DE MAPA EM TEMPO REAL */
-.map-live-banner {
+.cidade-header-bar p {
+  font-size: 0.9rem;
+  color: #15803d;
+}
+
+/* BANNER GOOGLE MAPS NA CIDADE */
+.map-city-banner {
   background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%);
   color: white;
   border-radius: var(--border-radius);
@@ -618,31 +643,54 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
   box-shadow: var(--shadow-md);
 }
 
-.map-live-banner h4 {
-  font-size: 1.15rem;
+.map-city-content h4 {
+  font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
-.map-live-banner p {
-  font-size: 0.9rem;
+.map-city-content p {
+  font-size: 0.925rem;
   color: #e2e8f0;
   max-width: 650px;
+  line-height: 1.5;
 }
 
-.pontos-grid {
+.btn-maps-large {
+  background-color: #22c55e;
+  color: #052e16;
+  font-weight: 700;
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-maps-large:hover {
+  background-color: #16a34a;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* GRID DE CANAIS OFICIAIS NA CIDADE */
+.canais-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.ponto-card {
+.canal-card {
   background: white;
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
@@ -651,62 +699,101 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: var(--transition);
 }
 
-.ponto-header {
-  margin-bottom: 1rem;
+.canal-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: #cbd5e1;
 }
 
-.ponto-tipo {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #0284c7;
-  background-color: #e0f2fe;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  margin-bottom: 0.4rem;
-}
-
-.ponto-nome {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.ponto-info {
-  list-style: none;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+.canal-top {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
-.ponto-info li {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.ponto-info li span.icon {
+.canal-icon {
+  font-size: 2rem;
+  line-height: 1;
   flex-shrink: 0;
 }
 
-.ponto-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+.canal-titulos h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.canal-badge {
+  display: inline-block;
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.badge-azul { background: #e0f2fe; color: #0369a1; }
+.badge-verde { background: #dcfce7; color: #15803d; }
+.badge-laranja { background: #ffedd5; color: #c2410c; }
+.badge-amarelo { background: #fef9c3; color: #854d0e; }
+.badge-vermelho { background: #fee2e2; color: #b91c1c; }
+.badge-marrom { background: #f5ebe0; color: #78350f; }
+
+.canal-body {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.canal-dica {
+  background-color: #f8fafc;
+  border-left: 3px solid var(--primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.825rem;
+  color: #334155;
+  margin-top: 0.75rem;
+}
+
+.canal-btn {
+  width: 100%;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* EMPTY STATE */
+.cidade-empty-state {
+  background: white;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--border-radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 
-.tag-mat {
-  background: #f1f5f9;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  color: #334155;
-  font-weight: 500;
+.cidade-empty-state h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.cidade-empty-state p {
+  max-width: 550px;
+  margin: 0 auto;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .pontos-notice {
