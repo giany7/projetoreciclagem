@@ -16,7 +16,7 @@
         <span class="logo-icon">♻️</span>
         <div class="logo-text">
           <h1>Recicla Consciente</h1>
-          <span>Projeto de Extensão Universitária • ODS 12</span>
+          <span>Educação Ambiental & Sustentabilidade • ODS 12</span>
         </div>
       </a>
 
@@ -26,9 +26,7 @@
         <li><a href="#guia" class="nav-link">Guia de Descarte</a></li>
         <li><a href="#onde-descartar" class="nav-link">Onde Descartar</a></li>
         <li><a href="#quiz" class="nav-link">Quiz Educativo</a></li>
-        <li><a href="#avaliacao" class="nav-link">Questionário</a></li>
-        <li><a href="#metricas" class="nav-link">Painel do Aluno</a></li>
-        <li><a href="#sobre" class="nav-link">Sobre o Projeto</a></li>
+        <li><a href="#metricas" class="nav-link">Painel de Métricas</a></li>
         <li><a href="#quiz" class="nav-link btn-nav-action">Fazer Quiz</a></li>
       </ul>
     </div>
@@ -199,112 +197,21 @@
 
           <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <button id="btnQuizRestart" class="btn btn-secondary">🔄 Refazer Teste</button>
-            <a href="#avaliacao" class="btn btn-primary">📋 Avaliar o Projeto</a>
+            <a href="#guia" class="btn btn-primary">🔍 Consultar Guia de Resíduos</a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. QUESTIONÁRIO DE AVALIAÇÃO COMUNITÁRIA -->
-  <section id="avaliacao" class="section section-alt">
+  <!-- 4. PAINEL DE MÉTRICAS & APRENDIZAGEM -->
+  <section id="metricas" class="section section-alt">
     <div class="container">
       <div class="section-header">
-        <span class="section-badge">Impacto e Percepção Comunitária</span>
-        <h2 class="section-title">Questionário de Avaliação da Ação</h2>
+        <span class="section-badge">Evidências e Aprendizagem</span>
+        <h2 class="section-title">Painel de Métricas do Projeto</h2>
         <p class="section-desc">
-          Este formulário é a ferramenta de validação da extensão universitária. Ele coleta dados anônimos sobre hábitos prévios, clareza das informações e intenção de engajamento da comunidade.
-        </p>
-      </div>
-
-      <div class="form-card">
-        <div id="formSuccessMsg" style="display: none; background: #dcfce7; border-left: 4px solid #16a34a; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; color: #14532d;">
-          <h4 style="font-weight: 700; margin-bottom: 0.35rem;">✅ Resposta registrada com sucesso!</h4>
-          <p style="font-size: 0.9rem;">Muito obrigado por contribuir com a pesquisa e com as métricas do nosso projeto de extensão comunitária.</p>
-        </div>
-
-        <form id="formAvaliacaoImpacto">
-          <div class="form-group">
-            <label for="faixaEtaria">1. Qual a sua faixa etária?</label>
-            <select id="faixaEtaria" name="faixaEtaria" required>
-              <option value="">Selecione uma opção...</option>
-              <option value="ate_18">Menos de 18 anos</option>
-              <option value="18-25">18 a 25 anos (jovem universitário / estudante)</option>
-              <option value="26-40">26 a 40 anos</option>
-              <option value="41-60">41 a 60 anos</option>
-              <option value="mais_60">Mais de 60 anos</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>2. Você já costumava separar materiais recicláveis em sua casa antes de conhecer este site?</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="separavaAntes" value="sim" required> Sim, separava a maioria dos recicláveis.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="separavaAntes" value="as_vezes"> Às vezes, apenas latinhas ou caixas grandes.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="separavaAntes" value="nao"> Não separava ou tinha muitas dúvidas sobre como fazer.
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>3. O conteúdo e o guia de descarte do site foram claros e fáceis de compreender?</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="clarezaSite" value="excelente" required> Excelente, tirou dúvidas práticas importantes (ex: caixas de pizza, vidro quebrado).
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="clarezaSite" value="bom"> Bom, conteúdo útil e bem organizado.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="clarezaSite" value="regular"> Regular, ainda fiquei com dúvidas.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="clarezaSite" value="ruim"> Ruim ou confuso.
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>4. Após utilizar o site e o quiz, você pretende adotar ou melhorar a separação do lixo na sua rotina?</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="intencaoSeparar" value="sim_total" required> Sim, com certeza vou começar ou aprimorar a separação.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="intencaoSeparar" value="provavelmente"> Provavelmente sim.
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="intencaoSeparar" value="pouco_provavel"> Pouco provável ou ainda não sei onde levar.
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="comentario">5. Deixe uma observação, crítica ou sugestão para a equipe do projeto:</label>
-            <textarea id="comentario" name="comentario" rows="3" placeholder="O que você mais gostou ou o que podemos adicionar (ex: novos pontos de coleta na sua rua)?"></textarea>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1rem;">
-            📤 Enviar Avaliação do Projeto
-          </button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. PAINEL DE MÉTRICAS DO ALUNO / EXTENSÃO -->
-  <section id="metricas" class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Evidências para o Relatório Acadêmico</span>
-        <h2 class="section-title">Painel de Métricas da Ação de Extensão</h2>
-        <p class="section-desc">
-          Este painel consolida os indicadores exigidos pelas faculdades: alcance público, taxa de aprendizagem (pré vs pós-teste) e índice de intenção de mudança comportamental.
+          Acompanhe os indicadores de alcance da plataforma e a eficácia pedagógica mensurada através do quiz interativo (diagnóstico inicial vs avaliação final).
         </p>
       </div>
 
@@ -315,23 +222,23 @@
             <div class="metric-desc">Visualizações do Site</div>
           </div>
           <div class="metric-box">
-            <div class="metric-val" id="dashTotalAvaliacoes">0</div>
-            <div class="metric-desc">Questionários Respondidos</div>
-          </div>
-          <div class="metric-box">
             <div class="metric-val" id="dashTotalQuizzes">0</div>
             <div class="metric-desc">Quizzes Concluídos</div>
           </div>
           <div class="metric-box">
-            <div class="metric-val" id="dashSatisfacao">0%</div>
-            <div class="metric-desc">Avaliação Positiva do Site</div>
+            <div class="metric-val" id="dashQuizzesAntes">0</div>
+            <div class="metric-desc">Diagnósticos Iniciais (Antes)</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val" id="dashQuizzesDepois">0</div>
+            <div class="metric-desc">Avaliações Finais (Depois)</div>
           </div>
         </div>
 
         <div class="metrics-analysis">
-          <h4>📈 Métrica 2: Avaliação de Aprendizagem (Quiz Antes vs Depois)</h4>
+          <h4>📈 Avaliação de Aprendizagem (Quiz Antes vs Depois)</h4>
           <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-            Compara a pontuação média dos participantes no teste diagnóstico inicial com a pontuação após consultarem as informações e o guia do projeto:
+            Compara a pontuação média dos participantes no teste diagnóstico inicial com a pontuação após consultarem as informações e o guia de materiais:
           </p>
 
           <div class="progress-compare-item">
@@ -360,8 +267,8 @@
               <div id="dashEvolucaoPontos" style="font-size: 1.5rem; font-weight: 800; color: #16a34a;">0 p.p.</div>
             </div>
             <div>
-              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Intenção de Mudança de Hábitos:</div>
-              <div id="dashIntencaoMudar" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0%</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Média de Acertos Pós-Uso:</div>
+              <div id="dashMediaDepois" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0%</div>
             </div>
           </div>
         </div>
@@ -369,10 +276,10 @@
         <div class="metrics-actions">
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <button id="btnExportCSV" class="btn btn-primary">
-              💾 Exportar Relatório para Excel (CSV)
+              💾 Exportar Resultados para Excel (CSV)
             </button>
-            <button id="btnMockData" class="btn btn-secondary" title="Carrega dados fictícios para testar a visualização e apresentação acadêmica">
-              ⚡ Carregar Dados de Demonstração (30+ respostas)
+            <button id="btnMockData" class="btn btn-secondary" title="Carrega dados simulados de testes para visualização dos gráficos">
+              ⚡ Carregar Dados de Demonstração (30+ testes)
             </button>
           </div>
           <button id="btnResetData" class="btn btn-outline-danger">
@@ -383,116 +290,13 @@
     </div>
   </section>
 
-  <!-- 6. SOBRE O PROJETO & RELATÓRIO ACADÊMICO -->
-  <section id="sobre" class="section section-alt">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Estrutura Curricular</span>
-        <h2 class="section-title">Sobre o Projeto de Extensão Universitária</h2>
-        <p class="section-desc">
-          Desenvolvido em conformidade com as diretrizes do Ministério da Educação (MEC) para a Curricularização da Extensão no Ensino Superior (Resolução CNE/CES nº 7/2018).
-        </p>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-card">
-          <h3 style="font-size: 1.35rem; color: #064e3b; margin-bottom: 0.75rem;">Objetivos e Metodologia</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">
-            O projeto <strong>Recicla Consciente</strong> foi criado para suprir o gargalo de desinformação pública sobre separação de resíduos sólidos urbanos, facilitando o diálogo entre cidadãos, cooperativas de catadores e a cadeia de reciclagem local.
-          </p>
-
-          <h4 style="font-size: 1rem; margin-top: 1.25rem; margin-bottom: 0.5rem;">Objetivos Centrais da Ação:</h4>
-          <ul style="list-style: square; padding-left: 1.25rem; font-size: 0.925rem; color: var(--text-secondary); line-height: 1.7;">
-            <li>Promover a educação ambiental acessível por meio de ferramenta digital interativa.</li>
-            <li>Divulgar e incentivar o uso dos pontos de entrega voluntária e cooperativas locais.</li>
-            <li>Desmistificar erros cotidianos (contaminação por gordura, riscos com vidros pontiagudos).</li>
-            <li>Mensurar cientificamente o impacto pedagógico e a intenção de mudança de atitude.</li>
-          </ul>
-
-          <div class="ods-badges">
-            <div class="ods-pill ods-12">
-              <span class="ods-num">12</span>
-              <span>ODS 12: Consumo e Produção Responsáveis (Metas 12.5 e 12.8)</span>
-            </div>
-            <div class="ods-pill ods-11">
-              <span class="ods-num">11</span>
-              <span>ODS 11: Cidades e Comunidades Sustentáveis</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="about-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-            <h3 style="font-size: 1.35rem; color: #064e3b;">Ficha do Acadêmico</h3>
-            <button id="btnOpenConfig" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-              ✏️ Personalizar Dados
-            </button>
-          </div>
-
-          <div class="team-info-box">
-            <h4>Estudante Responsável:</h4>
-            <p id="displayAluno" style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">Ingrid</p>
-
-            <h4 style="margin-top: 0.75rem;">Curso:</h4>
-            <p id="displayCurso" style="color: var(--text-secondary);">Graduação / Ensino Superior</p>
-
-            <h4 style="margin-top: 0.75rem;">Instituição de Ensino Superior:</h4>
-            <p id="displayInstituicao" style="color: var(--text-secondary);">Universidade / Faculdade</p>
-
-            <h4 style="margin-top: 0.75rem;">Orientação Docente:</h4>
-            <p id="displayOrientador" style="color: var(--text-secondary);">Prof. Orientador(a)</p>
-          </div>
-
-          <div style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-            <strong>Base legal e referencial teórico:</strong>
-            Política Nacional de Resíduos Sólidos (PNRS - Lei nº 12.305/2010), Resoluções CONAMA e Objetivos de Desenvolvimento Sustentável das Nações Unidas (Agenda 2030).
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MODAL DE PERSONALIZAÇÃO DOS DADOS DO ALUNO -->
-  <div id="configModal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 style="font-size: 1.2rem; color: #0f172a;">Personalizar Ficha do Estudante</h3>
-        <button id="btnCloseConfig" class="modal-close-btn">&times;</button>
-      </div>
-      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-        Insira seus dados para que o site e o relatório exportado em CSV contenham o seu nome e as informações da sua faculdade.
-      </p>
-
-      <div class="form-group">
-        <label for="inputNomeAluno">Seu Nome Completo:</label>
-        <input type="text" id="inputNomeAluno" placeholder="Ex: Ingrid Silva">
-      </div>
-      <div class="form-group">
-        <label for="inputCurso">Seu Curso Universitário:</label>
-        <input type="text" id="inputCurso" placeholder="Ex: Análise e Desenv. de Sistemas / Eng. Ambiental / Pedagogia">
-      </div>
-      <div class="form-group">
-        <label for="inputInstituicao">Nome da Faculdade / Universidade:</label>
-        <input type="text" id="inputInstituicao" placeholder="Ex: Universidade Federal / Estácio / Unip / PUC">
-      </div>
-      <div class="form-group">
-        <label for="inputOrientador">Nome do Professor Orientador:</label>
-        <input type="text" id="inputOrientador" placeholder="Ex: Prof. Dr. Carlos Souza">
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
-        <button id="btnSaveConfig" class="btn btn-primary">Salvar Informações</button>
-      </div>
-    </div>
-  </div>
-
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-col">
         <h4>Recicla Consciente</h4>
         <p>
-          Projeto de Extensão Universitária voltado à promoção da sustentabilidade e ao cumprimento da Agenda 2030 da ONU no Brasil. O projeto atua unindo cidadãos, tecnologia acessível e valorização dos trabalhadores da reciclagem.
+          Projeto voltado à promoção da sustentabilidade e ao cumprimento da Agenda 2030 da ONU no Brasil (ODS 12 e 11). Unindo cidadãos, informação prática e respeito ao meio ambiente.
         </p>
       </div>
       <div class="footer-col">
@@ -501,8 +305,7 @@
           <li><a href="#guia">Guia de Separação</a></li>
           <li><a href="#onde-descartar">Pontos de Coleta</a></li>
           <li><a href="#quiz">Quiz Interativo</a></li>
-          <li><a href="#avaliacao">Formulário de Pesquisa</a></li>
-          <li><a href="#metricas">Painel de Resultados</a></li>
+          <li><a href="#metricas">Painel de Métricas</a></li>
         </ul>
       </div>
       <div class="footer-col">
