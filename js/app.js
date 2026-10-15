@@ -1,11 +1,10 @@
 // Lógica da Aplicação Recicla Consciente
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização de Estado e Armazenamento Local
-  initStorage();
+  initStorage().then(updateMetricsDashboard);
   initBuscaCidade();
   renderMateriais("todos");
   initQuiz();
-  updateMetricsDashboard();
   initNavEvents();
 });
 
@@ -13,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // 1. GERENCIAMENTO DE ESTADO E STORAGE
 // ==========================================
 // As métricas são cumulativas e compartilhadas entre todos os visitantes,
-// armazenadas em contadores online (Abacus): visitas, quantidade de quizzes e soma de acertos por etapa.
+// armazenadas em contadores online (Abacus): visitas, quantidade de quizzes por etapa e a soma de
+// acertos, codificada em bits (um contador por bit) para que cada quiz exija poucas requisições.
 const METRICAS_API = "https://abacus.jasoncameron.dev";
 const METRICAS_NS = "recicla-consciente-extensao";
 const METRICAS_CACHE = "recicla_metricas_cache";
@@ -22,23 +22,60 @@ function totalQuestoes() {
   return RECICLA_DATA.quizPerguntas.length;
 }
 
+function totalBits() {
+  return Math.ceil(Math.log2(totalQuestoes() + 1));
+}
+
+const esperar = ms => new Promise(res => setTimeout(res, ms));
+
+// Repete a chamada se o serviço limitar a taxa de requisições (429)
+async function requisitarContador(url, tentativas = 6) {
+  for (let i = 0; i < tentativas; i++) {
+    try {
+      const r = await fetch(url);
+      if (r.status !== 429) return r;
+    } catch (e) {
+      if (i === tentativas - 1) throw e;
+    }
+    await esperar(1200 * (i + 1));
+  }
+  throw new Error("Limite de requisições");
+}
+
 async function contadorGet(chave) {
-  const r = await fetch(`${METRICAS_API}/get/${METRICAS_NS}/${chave}`);
+  const r = await requisitarContador(`${METRICAS_API}/get/${METRICAS_NS}/${chave}`);
   if (r.status === 404) return 0;
   if (!r.ok) throw new Error(`Falha ${r.status}`);
   return (await r.json()).value || 0;
 }
 
 function contadorHit(chave) {
-  return fetch(`${METRICAS_API}/hit/${METRICAS_NS}/${chave}`).catch(() => null);
+  return requisitarContador(`${METRICAS_API}/hit/${METRICAS_NS}/${chave}`).catch(() => null);
 }
 
-async function carregarMetricas() {
+async function lerEtapa(etapa) {
+  const bits = totalBits();
+  const chaves = [`${etapa}_qtd`];
+  for (let b = 0; b < bits; b++) chaves.push(`${etapa}_b${b}`);
+  const v = await Promise.all(chaves.map(contadorGet));
+  const soma = v.slice(1).reduce((acc, c, b) => acc + c * 2 ** b, 0);
+  return { qtd: v[0], soma };
+}
+
+let metricasEmAndamento = null;
+
+function carregarMetricas() {
+  // Evita requisições duplicadas quando várias partes da página pedem as métricas ao mesmo tempo
+  if (!metricasEmAndamento) {
+    metricasEmAndamento = buscarMetricas().finally(() => { metricasEmAndamento = null; });
+  }
+  return metricasEmAndamento;
+}
+
+async function buscarMetricas() {
   try {
-    const [visitas, antesQtd, antesSoma, depoisQtd, depoisSoma] = await Promise.all(
-      ["visitas", "antes_qtd", "antes_soma", "depois_qtd", "depois_soma"].map(contadorGet)
-    );
-    const m = { visitas, antes: { qtd: antesQtd, soma: antesSoma }, depois: { qtd: depoisQtd, soma: depoisSoma } };
+    const [visitas, antes, depois] = await Promise.all([contadorGet("visitas"), lerEtapa("antes"), lerEtapa("depois")]);
+    const m = { visitas, antes, depois };
     localStorage.setItem(METRICAS_CACHE, JSON.stringify(m));
     return m;
   } catch (e) {
@@ -52,11 +89,11 @@ function resumoModo(dados) {
   return { qtd: dados.qtd, media };
 }
 
-function initStorage() {
+async function initStorage() {
   // Conta uma visita por sessão do navegador
   if (!sessionStorage.getItem("recicla_visita_contada")) {
     sessionStorage.setItem("recicla_visita_contada", "1");
-    contadorHit("visitas").then(() => updateMetricsDashboard());
+    await contadorHit("visitas");
   }
 }
 
@@ -469,10 +506,11 @@ function showQuizResults() {
 async function salvarTentativaQuiz(modo, acertos) {
   const etapa = modo === "antes" ? "antes" : "depois";
   const hits = [contadorHit(`${etapa}_qtd`)];
-  for (let i = 0; i < acertos; i++) hits.push(contadorHit(`${etapa}_soma`));
+  for (let b = 0; b < totalBits(); b++) {
+    if (acertos & (1 << b)) hits.push(contadorHit(`${etapa}_b${b}`));
+  }
   await Promise.all(hits);
-  await updateMetricsDashboard();
-  renderQuizComparativo();
+  await Promise.all([updateMetricsDashboard(), renderQuizComparativo()]);
 }
 
 async function renderQuizComparativo() {
