@@ -12,19 +12,51 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // 1. GERENCIAMENTO DE ESTADO E STORAGE
 // ==========================================
-function initStorage() {
-  if (!localStorage.getItem("recicla_visits")) {
-    localStorage.setItem("recicla_visits", "1");
-  } else {
-    const visits = parseInt(localStorage.getItem("recicla_visits"), 10) + 1;
-    localStorage.setItem("recicla_visits", visits.toString());
-  }
+// As métricas são cumulativas e compartilhadas entre todos os visitantes,
+// armazenadas em contadores online (Abacus): visitas, quantidade de quizzes e soma de acertos por etapa.
+const METRICAS_API = "https://abacus.jasoncameron.dev";
+const METRICAS_NS = "recicla-consciente-extensao";
+const METRICAS_CACHE = "recicla_metricas_cache";
 
-  if (!localStorage.getItem("recicla_quiz_antes")) {
-    localStorage.setItem("recicla_quiz_antes", JSON.stringify([]));
+function totalQuestoes() {
+  return RECICLA_DATA.quizPerguntas.length;
+}
+
+async function contadorGet(chave) {
+  const r = await fetch(`${METRICAS_API}/get/${METRICAS_NS}/${chave}`);
+  if (r.status === 404) return 0;
+  if (!r.ok) throw new Error(`Falha ${r.status}`);
+  return (await r.json()).value || 0;
+}
+
+function contadorHit(chave) {
+  return fetch(`${METRICAS_API}/hit/${METRICAS_NS}/${chave}`).catch(() => null);
+}
+
+async function carregarMetricas() {
+  try {
+    const [visitas, antesQtd, antesSoma, depoisQtd, depoisSoma] = await Promise.all(
+      ["visitas", "antes_qtd", "antes_soma", "depois_qtd", "depois_soma"].map(contadorGet)
+    );
+    const m = { visitas, antes: { qtd: antesQtd, soma: antesSoma }, depois: { qtd: depoisQtd, soma: depoisSoma } };
+    localStorage.setItem(METRICAS_CACHE, JSON.stringify(m));
+    return m;
+  } catch (e) {
+    const cache = localStorage.getItem(METRICAS_CACHE);
+    return cache ? JSON.parse(cache) : null;
   }
-  if (!localStorage.getItem("recicla_quiz_depois")) {
-    localStorage.setItem("recicla_quiz_depois", JSON.stringify([]));
+}
+
+function resumoModo(dados) {
+  const media = dados.qtd ? Math.round((dados.soma / (dados.qtd * totalQuestoes())) * 100) : 0;
+  return { qtd: dados.qtd, media };
+}
+
+function initStorage() {
+  // Conta uma visita por sessão do navegador
+  if (!sessionStorage.getItem("recicla_visita_contada")) {
+    sessionStorage.setItem("recicla_visita_contada", "1");
+    contadorHit("visitas").then(() => updateMetricsDashboard());
   }
 }
 
@@ -430,34 +462,30 @@ function showQuizResults() {
   }
   document.getElementById("quizResultMessage").textContent = msg;
 
-  // Salvar no LocalStorage
-  salvarTentativaQuiz(quizMode, percent, userScore, total);
-  updateMetricsDashboard();
+  // Registrar no contador compartilhado
+  salvarTentativaQuiz(quizMode, userScore);
+}
+
+async function salvarTentativaQuiz(modo, acertos) {
+  const etapa = modo === "antes" ? "antes" : "depois";
+  const hits = [contadorHit(`${etapa}_qtd`)];
+  for (let i = 0; i < acertos; i++) hits.push(contadorHit(`${etapa}_soma`));
+  await Promise.all(hits);
+  await updateMetricsDashboard();
   renderQuizComparativo();
 }
 
-function salvarTentativaQuiz(modo, percentual, acertos, total) {
-  const key = modo === "antes" ? "recicla_quiz_antes" : "recicla_quiz_depois";
-  const lista = JSON.parse(localStorage.getItem(key) || "[]");
-  lista.push({
-    data: new Date().toISOString(),
-    percentual,
-    acertos,
-    total
-  });
-  localStorage.setItem(key, JSON.stringify(lista));
-}
-
-function renderQuizComparativo() {
+async function renderQuizComparativo() {
   const elComp = document.getElementById("quizComparativoView");
   if (!elComp) return;
 
-  const antes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
-  const depois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
+  const m = await carregarMetricas();
+  const antes = m ? resumoModo(m.antes) : { qtd: 0, media: 0 };
+  const depois = m ? resumoModo(m.depois) : { qtd: 0, media: 0 };
 
-  if (antes.length > 0 && depois.length > 0) {
-    const mediaAntes = Math.round(antes.reduce((acc, c) => acc + c.percentual, 0) / antes.length);
-    const mediaDepois = Math.round(depois.reduce((acc, c) => acc + c.percentual, 0) / depois.length);
+  if (antes.qtd > 0 && depois.qtd > 0) {
+    const mediaAntes = antes.media;
+    const mediaDepois = depois.media;
     const diff = mediaDepois - mediaAntes;
 
     elComp.style.display = "block";
@@ -491,21 +519,18 @@ function renderQuizComparativo() {
 // ==========================================
 // 5. DASHBOARD DE MÉTRICAS & EXPORTAÇÃO
 // ==========================================
-function updateMetricsDashboard() {
-  const visits = parseInt(localStorage.getItem("recicla_visits") || "1", 10);
-  const quizAntes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
-  const quizDepois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
+async function updateMetricsDashboard() {
+  const m = await carregarMetricas();
+  if (!m) return;
 
-  const totalQuizzes = quizAntes.length + quizDepois.length;
-
-  // Médias
-  const mediaAntes = quizAntes.length 
-    ? Math.round(quizAntes.reduce((acc, cur) => acc + cur.percentual, 0) / quizAntes.length) 
-    : 0;
-
-  const mediaDepois = quizDepois.length 
-    ? Math.round(quizDepois.reduce((acc, cur) => acc + cur.percentual, 0) / quizDepois.length) 
-    : 0;
+  const visits = m.visitas;
+  const antes = resumoModo(m.antes);
+  const depois = resumoModo(m.depois);
+  const quizAntes = { length: antes.qtd };
+  const quizDepois = { length: depois.qtd };
+  const totalQuizzes = antes.qtd + depois.qtd;
+  const mediaAntes = antes.media;
+  const mediaDepois = depois.media;
 
   // Atualiza DOM
   setTextSafe("dashVisitas", visits);
@@ -543,45 +568,6 @@ function setTextSafe(id, val) {
   const el = document.getElementById(id);
   if (el) el.textContent = val;
 }
-
-// Função utilitária para exportação técnica via console caso necessário (window.exportarMetricasCSV())
-window.exportarMetricasCSV = function() {
-  const quizAntes = JSON.parse(localStorage.getItem("recicla_quiz_antes") || "[]");
-  const quizDepois = JSON.parse(localStorage.getItem("recicla_quiz_depois") || "[]");
-
-  if (quizAntes.length === 0 && quizDepois.length === 0) {
-    alert("Não há dados de testes para exportar ainda.");
-    return;
-  }
-
-  let csvContent = "\uFEFF";
-  csvContent += "RELATORIO DE METRICAS - PROJETO RECICLA CONSCIENTE\n";
-  csvContent += `Data de Exportacao:;${new Date().toLocaleDateString('pt-BR')}\n\n`;
-
-  csvContent += "=== RESUMO DAS METRICAS ===\n";
-  csvContent += `Total de Visitantes Unicos (Acessos):;${localStorage.getItem("recicla_visits") || 1}\n`;
-  csvContent += `Total de Quizzes Concluidos:;${quizAntes.length + quizDepois.length}\n`;
-  csvContent += `Testes no Quiz - Antes (Diagnostico):;${quizAntes.length}\n`;
-  csvContent += `Testes no Quiz - Depois (Pos-Uso):;${quizDepois.length}\n\n`;
-
-  csvContent += "=== RESULTADOS DO QUIZ (APRENDIZAGEM) ===\n";
-  csvContent += "Etapa;Data;Acertos;Total;Aproveitamento (%)\n";
-  quizAntes.forEach(q => {
-    csvContent += `Antes (Diagnostico);${q.data};${q.acertos};${q.total};${q.percentual}%\n`;
-  });
-  quizDepois.forEach(q => {
-    csvContent += `Depois (Pos-uso);${q.data};${q.acertos};${q.total};${q.percentual}%\n`;
-  });
-
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", `Resultados_Quiz_ReciclaConsciente_${new Date().toISOString().slice(0, 10)}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
 
 // ==========================================
 // 6. EVENTOS GERAIS DE NAVEGAÇÃO E UX
