@@ -60,14 +60,16 @@ async function contadorHit(chave) {
 
 async function lerEtapa(etapa) {
   const bits = totalBits();
-  const chaves = [`${etapa}_qtd`];
+  const chaves = [`${etapa}_qtd`, `${etapa}_soma`];
   for (let b = 0; b < bits; b++) chaves.push(`${etapa}_b${b}`);
   const v = [];
   for (const chave of chaves) {
     v.push(await contadorGet(chave));
     await esperar(250);
   }
-  const soma = v.slice(1).reduce((acc, c, b) => acc + c * 2 ** b, 0);
+  const somaLegada = v[1];
+  const somaNovos = v.slice(2).reduce((acc, c, b) => acc + c * 2 ** b, 0);
+  const soma = somaLegada + somaNovos;
   return { qtd: v[0], soma };
 }
 
