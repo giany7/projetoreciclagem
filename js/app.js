@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderMateriais("todos");
   initQuiz();
   initNavEvents();
+  window.setInterval(() => {
+    if (document.visibilityState === "visible") updateMetricsDashboard();
+  }, 60000);
 });
 
 // ==========================================
@@ -49,15 +52,21 @@ async function contadorGet(chave) {
   return (await r.json()).value || 0;
 }
 
-function contadorHit(chave) {
-  return requisitarContador(`${METRICAS_API}/hit/${METRICAS_NS}/${chave}`).catch(() => null);
+async function contadorHit(chave) {
+  const r = await requisitarContador(`${METRICAS_API}/hit/${METRICAS_NS}/${chave}`);
+  if (!r.ok) throw new Error(`Falha ao registrar métrica (${r.status})`);
+  return r.json();
 }
 
 async function lerEtapa(etapa) {
   const bits = totalBits();
   const chaves = [`${etapa}_qtd`];
   for (let b = 0; b < bits; b++) chaves.push(`${etapa}_b${b}`);
-  const v = await Promise.all(chaves.map(contadorGet));
+  const v = [];
+  for (const chave of chaves) {
+    v.push(await contadorGet(chave));
+    await esperar(250);
+  }
   const soma = v.slice(1).reduce((acc, c, b) => acc + c * 2 ** b, 0);
   return { qtd: v[0], soma };
 }
@@ -74,7 +83,9 @@ function carregarMetricas() {
 
 async function buscarMetricas() {
   try {
-    const [visitas, antes, depois] = await Promise.all([contadorGet("visitas"), lerEtapa("antes"), lerEtapa("depois")]);
+    const visitas = await contadorGet("visitas");
+    const antes = await lerEtapa("antes");
+    const depois = await lerEtapa("depois");
     const m = { visitas, antes, depois };
     localStorage.setItem(METRICAS_CACHE, JSON.stringify(m));
     return m;
@@ -93,7 +104,11 @@ async function initStorage() {
   // Conta uma visita por sessão do navegador
   if (!sessionStorage.getItem("recicla_visita_contada")) {
     sessionStorage.setItem("recicla_visita_contada", "1");
-    await contadorHit("visitas");
+    try {
+      await contadorHit("visitas");
+    } catch (error) {
+      console.error("Falha ao registrar a visita:", error);
+    }
   }
 }
 
@@ -505,12 +520,23 @@ function showQuizResults() {
 
 async function salvarTentativaQuiz(modo, acertos) {
   const etapa = modo === "antes" ? "antes" : "depois";
-  const hits = [contadorHit(`${etapa}_qtd`)];
+  const hits = [`${etapa}_qtd`];
   for (let b = 0; b < totalBits(); b++) {
-    if (acertos & (1 << b)) hits.push(contadorHit(`${etapa}_b${b}`));
+    if (acertos & (1 << b)) hits.push(`${etapa}_b${b}`);
   }
-  await Promise.all(hits);
-  await Promise.all([updateMetricsDashboard(), renderQuizComparativo()]);
+  try {
+    for (const hit of hits) {
+      await contadorHit(hit);
+      await esperar(300);
+    }
+    await Promise.all([updateMetricsDashboard(), renderQuizComparativo()]);
+  } catch (error) {
+    const message = document.getElementById("quizResultMessage");
+    if (message) {
+      message.textContent += " Não foi possível sincronizar este resultado agora. Deixe a página aberta e tente atualizar as métricas em instantes.";
+    }
+    console.error("Falha ao sincronizar o resultado do quiz:", error);
+  }
 }
 
 async function renderQuizComparativo() {
@@ -559,7 +585,11 @@ async function renderQuizComparativo() {
 // ==========================================
 async function updateMetricsDashboard() {
   const m = await carregarMetricas();
-  if (!m) return;
+  if (!m) {
+    setTextSafe("dashEvolucaoPontos", "Indisponível");
+    setTextSafe("dashEvolucaoDetalhe", "Não foi possível carregar os resultados compartilhados. Verifique a conexão e atualize a página.");
+    return;
+  }
 
   const visits = m.visitas;
   const antes = resumoModo(m.antes);
@@ -595,9 +625,18 @@ async function updateMetricsDashboard() {
   const diffPts = mediaDepois - mediaAntes;
   const elEvol = document.getElementById("dashEvolucaoPontos");
   if (elEvol) {
-    elEvol.textContent = diffPts >= 0 ? `+${diffPts} p.p.` : `${diffPts} p.p.`;
-    elEvol.style.color = diffPts >= 0 ? "#16a34a" : "#dc2626";
+    const temComparacao = quizAntes.length > 0 && quizDepois.length > 0;
+    elEvol.textContent = temComparacao
+      ? (diffPts >= 0 ? `+${diffPts} p.p.` : `${diffPts} p.p.`)
+      : "Aguardando as duas etapas";
+    elEvol.style.color = !temComparacao ? "#64748b" : (diffPts >= 0 ? "#16a34a" : "#dc2626");
   }
+  setTextSafe(
+    "dashEvolucaoDetalhe",
+    quizAntes.length > 0 && quizDepois.length > 0
+      ? `Média coletiva: ${quizAntes.length} diagnósticos e ${quizDepois.length} avaliações`
+      : "O ganho aparece após pelo menos um diagnóstico e uma avaliação final."
+  );
 
   setTextSafe("dashMediaDepois", `${mediaDepois}%`);
 }
